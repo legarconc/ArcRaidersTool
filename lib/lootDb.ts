@@ -1,8 +1,85 @@
+export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legendary';
+export type LocationTag = 'ARC' | 'Industrial' | 'Residential' | 'Commercial' | 'Nature' | 'Medical' | 'Military' | 'Various';
+
 export interface Item {
   name: string;
   status: 'KEEP' | 'SELL' | 'RECYCLE';
   reason: string;
   location: string;
+}
+
+// Helper function to determine rarity based on item characteristics
+export function getItemRarity(item: Item): Rarity {
+  const name = item.name.toLowerCase();
+
+  // Legendary items
+  if (name.includes('queen') || name.includes('matriarch')) return 'Legendary';
+
+  // Epic items
+  if (name.includes('exodus') || name.includes('magnetic accelerator') ||
+      name.includes('advanced') || name.includes('power rod') ||
+      name.includes('mixtape') || name.includes('snow globe')) return 'Epic';
+
+  // Rare items - ARC parts, keys, refined materials
+  if (name.includes('driver') || name.includes('cell') || name.includes('vault') ||
+      name.includes('scanner') || name.includes('pulse unit') || name.includes('core') ||
+      name.includes('key') || name.includes('circuitry') || name.includes('components') ||
+      item.reason.includes('5,000') || item.reason.includes('3,000')) return 'Rare';
+
+  // Uncommon items
+  if (name.includes('arc ') || name.includes('gun parts') ||
+      name.includes('industrial') || name.includes('motor') ||
+      item.reason.includes('2,000') || item.reason.includes('upgrade')) return 'Uncommon';
+
+  // Common items
+  return 'Common';
+}
+
+// Helper function to determine location tag
+export function getLocationTag(item: Item): LocationTag {
+  const location = item.location.toLowerCase();
+  const name = item.name.toLowerCase();
+
+  if (location.includes('enemy') || location.includes('arc') ||
+      name.includes('driver') || name.includes('cell') || name.includes('pulse')) return 'ARC';
+  if (location.includes('industrial') || location.includes('factory') ||
+      location.includes('garage')) return 'Industrial';
+  if (location.includes('house') || location.includes('residential') ||
+      location.includes('kitchen')) return 'Residential';
+  if (location.includes('commercial') || location.includes('store') ||
+      location.includes('shop')) return 'Commercial';
+  if (location.includes('nature') || location.includes('grove') ||
+      location.includes('tree') || name.includes('fruit')) return 'Nature';
+  if (location.includes('medical') || location.includes('hospital')) return 'Medical';
+  if (location.includes('military') || location.includes('security')) return 'Military';
+
+  return 'Various';
+}
+
+// Filter functions
+export function filterByStatus(items: Item[], status: Item['status'] | 'ALL'): Item[] {
+  if (status === 'ALL') return items;
+  return items.filter(item => item.status === status);
+}
+
+export function filterByRarity(items: Item[], rarity: Rarity | 'ALL'): Item[] {
+  if (rarity === 'ALL') return items;
+  return items.filter(item => getItemRarity(item) === rarity);
+}
+
+export function filterByLocationTag(items: Item[], tag: LocationTag | 'ALL'): Item[] {
+  if (tag === 'ALL') return items;
+  return items.filter(item => getLocationTag(item) === tag);
+}
+
+export function searchItems(items: Item[], query: string): Item[] {
+  if (!query.trim()) return items;
+  const lowerQuery = query.toLowerCase();
+  return items.filter(item =>
+    item.name.toLowerCase().includes(lowerQuery) ||
+    item.reason.toLowerCase().includes(lowerQuery) ||
+    item.location.toLowerCase().includes(lowerQuery)
+  );
 }
 
 export const lootDb: Item[] = [
