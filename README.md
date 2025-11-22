@@ -12,6 +12,7 @@ A browser-based companion for **Arc Raiders** solo raiders. It gives you a livin
 - **Workshop + Scrappy Tracker** – Track each bench level, required materials, unlocks, and a recommended solo-friendly upgrade order. Scrappy upgrades are included for planning passive income.
 - **Skill + Blueprint Tracking** – Collapsible skill trees with recommended point buckets, plus a blueprint catalog that filters by ownership, bench, and priority.
 - **Solo Raider Roadmap** – A dedicated Progression tab walks you through phased checklists (Rat → Scavenger → Operator → Apex) with per-task tips plus planner deep links, so you always know the next craft, quest, loot run, or upgrade.
+- **Phone-Friendly Layouts** – Mobile users get a sticky tab bar and card-based mission views so requirements, hotspots, and roadmap steps stay readable on small screens without affecting desktop.
 - **Progress Sync** – All player inputs persist in the browser and can be exported/imported as JSON to sync between devices.
 
 ## Getting Started

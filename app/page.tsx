@@ -231,7 +231,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
         {/* LOOT DATABASE TAB */}
         {activeTab === 'loot' && (
           <div>
@@ -699,49 +699,86 @@ export default function Home() {
                   {missionPlan.requirements.length === 0 ? (
                     <p className="text-sm text-zinc-500">No materials needed. Head out and complete the mission objective.</p>
                   ) : (
-                    <div className="overflow-auto">
-                      <table className="w-full text-sm">
-                        <thead className="text-xs text-zinc-500">
-                          <tr>
-                            <th className="text-left py-2">Item</th>
-                            <th className="text-left py-2">Qty</th>
-                            <th className="text-left py-2">Tag</th>
-                            <th className="text-left py-2">Best Map / Hotspot</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {missionPlan.requirements.map(req => {
-                            const bestSpot = req.bestSpots[0];
-                            return (
-                              <tr key={req.itemName} className="border-t border-zinc-700">
-                                <td className="py-2">
-                                  <p className="font-semibold text-white">{req.itemName}</p>
-                                  {req.note && <p className="text-xs text-zinc-500">{req.note}</p>}
-                                </td>
-                                <td className="py-2 text-zinc-400">x{req.quantity}</td>
-                                <td className="py-2">
-                                  {req.locationTag && (
-                                    <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
-                                      {req.locationTag}
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="py-2 text-xs text-zinc-400">
-                                  {bestSpot ? (
-                                    <div>
-                                      <p className="text-white">{bestSpot.map} — {bestSpot.hotspot}</p>
-                                      <p className="text-zinc-500">{bestSpot.tip}</p>
-                                    </div>
-                                  ) : (
-                                    <span>Check loot database</span>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                    <>
+                      <div className="hidden md:block overflow-auto">
+                        <table className="w-full text-sm">
+                          <thead className="text-xs text-zinc-500">
+                            <tr>
+                              <th className="text-left py-2">Item</th>
+                              <th className="text-left py-2">Qty</th>
+                              <th className="text-left py-2">Tag</th>
+                              <th className="text-left py-2">Best Map / Hotspot</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {missionPlan.requirements.map(req => {
+                              const bestSpot = req.bestSpots[0];
+                              return (
+                                <tr key={req.itemName} className="border-t border-zinc-700">
+                                  <td className="py-2">
+                                    <p className="font-semibold text-white">{req.itemName}</p>
+                                    {req.note && <p className="text-xs text-zinc-500">{req.note}</p>}
+                                  </td>
+                                  <td className="py-2 text-zinc-400">x{req.quantity}</td>
+                                  <td className="py-2">
+                                    {req.locationTag && (
+                                      <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
+                                        {req.locationTag}
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="py-2 text-xs text-zinc-400">
+                                    {bestSpot ? (
+                                      <div>
+                                        <p className="text-white">{bestSpot.map} — {bestSpot.hotspot}</p>
+                                        <p className="text-zinc-500">{bestSpot.tip}</p>
+                                      </div>
+                                    ) : (
+                                      <span>Check loot database</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="md:hidden space-y-3">
+                        {missionPlan.requirements.map(req => {
+                          const bestSpot = req.bestSpots[0];
+                          return (
+                            <div key={req.itemName} className="border border-zinc-700 rounded-lg p-3 bg-zinc-900/40 text-sm">
+                              <div className="flex items-center justify-between">
+                                <p className="font-semibold text-white">{req.itemName}</p>
+                                <span className="text-yellow-400 font-bold">x{req.quantity}</span>
+                              </div>
+                              {req.note && <p className="text-xs text-zinc-500 mt-1">{req.note}</p>}
+                              <div className="flex items-center gap-2 mt-2">
+                                {req.locationTag && (
+                                  <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
+                                    {req.locationTag}
+                                  </span>
+                                )}
+                                {req.itemData?.rarity && (
+                                  <span className="text-xs text-zinc-500">{req.itemData.rarity}</span>
+                                )}
+                              </div>
+                              <div className="mt-2 text-xs text-zinc-400">
+                                {bestSpot ? (
+                                  <div>
+                                    <p className="text-white">{bestSpot.map}</p>
+                                    <p>{bestSpot.hotspot}</p>
+                                    <p className="text-zinc-500">{bestSpot.tip}</p>
+                                  </div>
+                                ) : (
+                                  <p>Check loot database</p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -773,6 +810,20 @@ export default function Home() {
           </div>
         )}
       </main>
+      <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-zinc-950/95 border-t border-zinc-800 px-2 py-2 flex items-center justify-around z-30 backdrop-blur">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex flex-col items-center text-[10px] font-medium px-2 py-1 rounded-lg transition ${
+              activeTab === tab.id ? 'text-yellow-400' : 'text-zinc-500'
+            }`}
+          >
+            <tab.icon size={18} />
+            <span className="mt-1">{tab.label.split(' ')[0]}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
