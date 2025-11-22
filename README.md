@@ -11,6 +11,7 @@ A browser-based companion for **Arc Raiders** solo raiders. It gives you a livin
 - **Planner (Upgrades + Quests)** – The Session Planner auto-generates every bench/Scrappy upgrade directly from `workshopDb`, groups them by workbench, and splits UI controls between Upgrades and Quests. It also ships with the default quest chain (Unexpected Initiative, Doctor’s Orders, Expedition Prep, Snap & Salvage, Tribute to Toledo, Armored Transports) so you can prep for story beats.
 - **Workshop + Scrappy Tracker** – Track each bench level, required materials, unlocks, and a recommended solo-friendly upgrade order. Scrappy upgrades are included for planning passive income.
 - **Skill + Blueprint Tracking** – Collapsible skill trees with recommended point buckets, plus a blueprint catalog that filters by ownership, bench, and priority.
+- **Solo Raider Roadmap** – A dedicated Progression tab walks you through Early/Mid/End-game checklists (with planner deep links) so you can see exactly what to craft, upgrade, or quest next.
 - **Progress Sync** – All player inputs persist in the browser and can be exported/imported as JSON to sync between devices.
 
 ## Getting Started
