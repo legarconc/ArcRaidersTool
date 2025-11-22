@@ -236,7 +236,7 @@ const rawLootDb: BaseItem[] = [
   { name: 'Rusted Gear', status: 'KEEP', reason: 'Gunsmith III upgrade', location: 'Industrial containers' },
   { name: 'Rusted Shut Medical Kit', status: 'KEEP', reason: 'Medical Lab III upgrade', location: 'Medical containers' },
   { name: 'Rusted Tools', status: 'KEEP', reason: 'Gunsmith II upgrade', location: 'Industrial containers' },
-  { name: 'Toaster', status: 'KEEP', reason: 'Refiner II upgrade', location: 'Houses, kitchens' },
+  { name: 'Toaster', status: 'RECYCLE', reason: 'Yields Mechanical Parts (Keep only for Refiner II)', location: 'Houses, kitchens' },
   { name: 'Humidifier', status: 'KEEP', reason: 'Expedition Stage 4', location: 'Houses' },
 
   // ═══════════════════════════════════════════════════════════════════════════

@@ -5,6 +5,8 @@ A browser-based companion for **Arc Raiders** solo raiders. It gives you a livin
 ## Highlights
 
 - **Authoritative Loot Database** – Every entry now carries hand-authored `rarity`, `locationTag`, and `status` labels (`KEEP`, `SELL`, `RECYCLE`, `USE`). Filters respect these tags, including new `Topside` and `Crafting` hotspots for farmable vs. refiner-only materials.
+- **Live Alpha/Beta Data** – Skills, blueprints, quests, and loot flags are synced with the latest Arc Raiders playtest (e.g., the refreshed Mobility tree, S-tier Bettina/Renegade/Anvil rankings, 1x Fertilizer for Unexpected Initiative, and the Toaster → `RECYCLE` change).
+- **Crash-Resistant Local Storage** – Workshop levels, Scrappy progress, skills, and blueprints store via a client-only hook that now guards against hydration loops, so toggling levels or importing saves won’t spam console errors.
 - **Contextual Farming Routes** – Items inherit curated hotspots (ARC crash sites, Refiner station, etc.) so the planner can generate realistic solo-friendly routes per mission requirement.
 - **Planner (Upgrades + Quests)** – The Session Planner auto-generates every bench/Scrappy upgrade directly from `workshopDb`, groups them by workbench, and splits UI controls between Upgrades and Quests. It also ships with the default quest chain (Unexpected Initiative, Doctor’s Orders, Expedition Prep, Snap & Salvage, Tribute to Toledo, Armored Transports) so you can prep for story beats.
 - **Workshop + Scrappy Tracker** – Track each bench level, required materials, unlocks, and a recommended solo-friendly upgrade order. Scrappy upgrades are included for planning passive income.

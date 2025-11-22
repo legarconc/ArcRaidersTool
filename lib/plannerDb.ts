@@ -130,10 +130,10 @@ const questMissions: Mission[] = [
     id: 'quest-unexpected-initiative',
     type: 'quest',
     title: 'Quest: Unexpected Initiative',
-    description: 'Help Scrappy expand operations with basic homestead supplies.',
+    description: 'Find supplies in Buried City (Grandioso Apts & Piazza Roma). Must extract in one run.',
     requirements: [
-      { itemName: 'Fertilizer', quantity: 3 },
-      { itemName: 'Water Pump', quantity: 1 }
+      { itemName: 'Fertilizer', quantity: 1, note: 'Rooftop of Grandioso Apts' },
+      { itemName: 'Water Pump', quantity: 1, note: 'Rooftop garden near Piazza Roma' }
     ],
     rewardNote: 'Improves Scrappy drops + XP'
   },

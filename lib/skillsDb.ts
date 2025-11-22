@@ -6,14 +6,15 @@ export interface Skill {
   priority: 'Critical' | 'High' | 'Medium' | 'Optional';
   description: string;
   benefit: string;
-  prerequisitePoints?: number; // Total points needed in branch before unlock
+  prerequisitePoints?: number; // Points needed in branch to unlock
+  isMajor?: boolean; // Major skills usually cost 1 point but have prerequisites
 }
 
 export interface SkillBranch {
   id: string;
   name: string;
   description: string;
-  priority: number; // 1 = highest
+  priority: number;
   color: string;
   skills: Skill[];
 }
@@ -22,7 +23,7 @@ export const skillBranches: SkillBranch[] = [
   {
     id: 'mobility',
     name: 'Mobility',
-    description: 'Movement speed, stamina, and traversal abilities',
+    description: 'Stamina efficiency, speed, and traversal.',
     priority: 1,
     color: 'emerald',
     skills: [
@@ -33,7 +34,8 @@ export const skillBranches: SkillBranch[] = [
         recommendedPoints: 5,
         priority: 'Critical',
         description: 'Reduces stamina cost for sprinting',
-        benefit: '-5% stamina cost per point (25% total)'
+        benefit: '-5% stamina cost per point',
+        isMajor: false
       },
       {
         id: 'youthful-lungs',
@@ -42,7 +44,8 @@ export const skillBranches: SkillBranch[] = [
         recommendedPoints: 5,
         priority: 'Critical',
         description: 'Increases maximum stamina pool',
-        benefit: '+10% max stamina per point (50% total)'
+        benefit: '+10% max stamina per point',
+        isMajor: false
       },
       {
         id: 'slip-and-slide',
@@ -51,59 +54,67 @@ export const skillBranches: SkillBranch[] = [
         recommendedPoints: 3,
         priority: 'High',
         description: 'Faster sliding and stamina regen while sliding',
-        benefit: 'Extended slide distance, regen stamina mid-slide'
+        benefit: 'Extended slide distance',
+        isMajor: false
       },
       {
         id: 'sturdy-ankles',
         name: 'Sturdy Ankles',
         maxPoints: 5,
         recommendedPoints: 1,
-        priority: 'High',
+        priority: 'Medium',
         description: 'Reduces fall damage taken',
-        benefit: '-15% fall damage per point'
+        benefit: '-15% fall damage per point',
+        isMajor: false
+      },
+      {
+        id: 'ready-to-roll',
+        name: 'Ready to Roll',
+        maxPoints: 5,
+        recommendedPoints: 1,
+        priority: 'Optional',
+        description: 'Increases timing window for recovery rolls',
+        benefit: 'Easier fall recovery',
+        isMajor: false
       },
       {
         id: 'carry-the-momentum',
         name: 'Carry the Momentum',
-        maxPoints: 5,
+        maxPoints: 1,
         recommendedPoints: 1,
         priority: 'Medium',
         description: 'Sprint immediately after rolling without stamina cost',
-        benefit: 'Smooth roll-to-sprint transitions'
+        benefit: 'Free sprint after dodge',
+        prerequisitePoints: 15,
+        isMajor: true
       },
       {
         id: 'calming-stroll',
         name: 'Calming Stroll',
-        maxPoints: 5,
+        maxPoints: 1,
         recommendedPoints: 1,
         priority: 'High',
         description: 'Regenerate stamina while walking',
-        benefit: 'Passive stamina regen during walk'
+        benefit: 'Passive regen during walk',
+        prerequisitePoints: 15,
+        isMajor: true
       },
       {
-        id: 'quick-climber',
-        name: 'Quick Climber',
+        id: 'nimble-climber',
+        name: 'Nimble Climber',
         maxPoints: 5,
         recommendedPoints: 2,
         priority: 'Medium',
         description: 'Faster climbing and mantling speed',
-        benefit: '+10% climb speed per point'
-      },
-      {
-        id: 'nimble-feet',
-        name: 'Nimble Feet',
-        maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'Medium',
-        description: 'Move faster while crouched',
-        benefit: '+8% crouch speed per point'
+        benefit: '+10% climb speed per point',
+        isMajor: false
       }
     ]
   },
   {
     id: 'survival',
     name: 'Survival',
-    description: 'Looting, stealth, and resource management',
+    description: 'Looting speed, crafting, and carry capacity.',
     priority: 2,
     color: 'amber',
     skills: [
@@ -113,27 +124,39 @@ export const skillBranches: SkillBranch[] = [
         maxPoints: 5,
         recommendedPoints: 5,
         priority: 'Critical',
-        description: 'Faster item identification and container searching',
-        benefit: '-10% search time per point (50% total)'
+        description: 'Faster item identification and search speed',
+        benefit: '-10% search time per point',
+        isMajor: false
       },
       {
-        id: 'silent-scavenger',
-        name: 'Silent Scavenger',
+        id: 'looters-luck',
+        name: "Looter's Luck",
+        maxPoints: 5,
+        recommendedPoints: 1,
+        priority: 'Optional',
+        description: 'Chance to reveal multiple items at once',
+        benefit: 'Small chance for double reveal',
+        isMajor: false
+      },
+      {
+        id: 'broad-shoulders',
+        name: 'Broad Shoulders',
         maxPoints: 5,
         recommendedPoints: 5,
-        priority: 'Critical',
-        description: 'Reduced noise while looting containers',
-        benefit: 'Near-silent container opening'
+        priority: 'High',
+        description: 'Increases maximum weight capacity',
+        benefit: '+2kg capacity per point',
+        isMajor: false
       },
       {
-        id: 'in-round-crafting',
-        name: 'In-Round Crafting',
-        maxPoints: 1,
-        recommendedPoints: 1,
-        priority: 'Critical',
-        description: 'Ability to craft items during raids',
-        benefit: 'Craft healing items and ammo mid-raid',
-        prerequisitePoints: 15
+        id: 'agile-croucher',
+        name: 'Agile Croucher',
+        maxPoints: 5,
+        recommendedPoints: 2,
+        priority: 'Medium',
+        description: 'Move faster while crouched',
+        benefit: '+8% crouch speed per point',
+        isMajor: false
       },
       {
         id: 'revitalizing-squat',
@@ -142,7 +165,30 @@ export const skillBranches: SkillBranch[] = [
         recommendedPoints: 3,
         priority: 'High',
         description: 'Regenerate stamina faster while crouched',
-        benefit: '+15% stamina regen per point while crouched'
+        benefit: '+15% stamina regen while crouched',
+        isMajor: false
+      },
+      {
+        id: 'in-round-crafting',
+        name: 'In-Round Crafting',
+        maxPoints: 1,
+        recommendedPoints: 1,
+        priority: 'Critical',
+        description: 'Ability to craft basic items during raids',
+        benefit: 'Unlock field crafting menu',
+        prerequisitePoints: 15,
+        isMajor: true
+      },
+      {
+        id: 'traveling-tinkerer',
+        name: 'Traveling Tinkerer',
+        maxPoints: 1,
+        recommendedPoints: 1,
+        priority: 'High',
+        description: 'Unlocks additional field crafting recipes',
+        benefit: 'Craft advanced items field-side',
+        prerequisitePoints: 25,
+        isMajor: true
       },
       {
         id: 'security-breach',
@@ -151,42 +197,27 @@ export const skillBranches: SkillBranch[] = [
         recommendedPoints: 1,
         priority: 'High',
         description: 'Unlock security lockers without keys',
-        benefit: 'Access locked security containers',
-        prerequisitePoints: 36
+        benefit: 'Access red security containers',
+        prerequisitePoints: 36,
+        isMajor: true
       },
       {
-        id: 'proficient-pryer',
-        name: 'Proficient Pryer',
-        maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'High',
-        description: 'Faster breaching and prying speed',
-        benefit: '-10% breach time per point'
-      },
-      {
-        id: 'keen-eye',
-        name: 'Keen Eye',
-        maxPoints: 5,
-        recommendedPoints: 3,
+        id: 'good-as-new',
+        name: 'Good as New',
+        maxPoints: 1,
+        recommendedPoints: 1,
         priority: 'Medium',
-        description: 'Increased loot detection range',
-        benefit: 'See loot through walls at short range'
-      },
-      {
-        id: 'pack-rat',
-        name: 'Pack Rat',
-        maxPoints: 5,
-        recommendedPoints: 3,
-        priority: 'Medium',
-        description: 'Increased inventory capacity',
-        benefit: '+2 inventory slots per point'
+        description: 'Increased stamina regen while under healing effects',
+        benefit: 'Stamina boost while healing',
+        prerequisitePoints: 15,
+        isMajor: true
       }
     ]
   },
   {
     id: 'conditioning',
     name: 'Conditioning',
-    description: 'Health, shields, and damage resistance',
+    description: 'Health, damage reduction, and recovery.',
     priority: 3,
     color: 'blue',
     skills: [
@@ -194,80 +225,88 @@ export const skillBranches: SkillBranch[] = [
         id: 'gentle-pressure',
         name: 'Gentle Pressure',
         maxPoints: 5,
-        recommendedPoints: 5,
-        priority: 'High',
+        recommendedPoints: 3,
+        priority: 'Medium',
         description: 'Quieter breaching and door opening',
-        benefit: 'Near-silent door breaches'
+        benefit: 'Noise reduction',
+        isMajor: false
       },
       {
         id: 'used-to-the-weight',
         name: 'Used to the Weight',
         maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'Medium',
+        recommendedPoints: 5,
+        priority: 'High',
         description: 'Reduced movement penalty from shields',
-        benefit: '-8% encumbrance per point'
+        benefit: '-8% encumbrance per point',
+        isMajor: false
+      },
+      {
+        id: 'blast-born',
+        name: 'Blast-Born',
+        maxPoints: 5,
+        recommendedPoints: 1,
+        priority: 'Optional',
+        description: 'Hearing is less affected by explosions',
+        benefit: 'Resist tinnitus effects',
+        isMajor: false
       },
       {
         id: 'survivors-stamina',
         name: "Survivor's Stamina",
-        maxPoints: 5,
-        recommendedPoints: 3,
-        priority: 'High',
+        maxPoints: 1,
+        recommendedPoints: 1,
+        priority: 'Critical',
         description: 'Faster stamina regen when critically hurt',
-        benefit: '+20% stamina regen per point at low HP'
+        benefit: 'Emergency escape energy',
+        prerequisitePoints: 15,
+        isMajor: true
       },
       {
-        id: 'thick-skin',
-        name: 'Thick Skin',
-        maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'Medium',
-        description: 'Reduced damage from all sources',
-        benefit: '-3% damage taken per point'
-      },
-      {
-        id: 'quick-recovery',
-        name: 'Quick Recovery',
-        maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'Medium',
-        description: 'Faster health regeneration out of combat',
-        benefit: '+15% health regen per point'
-      },
-      {
-        id: 'shield-specialist',
-        name: 'Shield Specialist',
-        maxPoints: 5,
-        recommendedPoints: 2,
-        priority: 'Medium',
-        description: 'Shields recharge faster',
-        benefit: '-10% shield recharge delay per point'
-      },
-      {
-        id: 'last-stand',
-        name: 'Last Stand',
+        id: 'fight-or-flight',
+        name: 'Fight or Flight',
         maxPoints: 1,
         recommendedPoints: 1,
         priority: 'High',
-        description: 'Brief invulnerability when reaching critical health',
-        benefit: '2 seconds of damage immunity once per raid',
-        prerequisitePoints: 25
+        description: 'Regain fixed stamina when taking damage',
+        benefit: 'Burst stamina on hit (Cooldown)',
+        prerequisitePoints: 15,
+        isMajor: true
       },
       {
-        id: 'iron-will',
-        name: 'Iron Will',
+        id: 'turtle-crawl',
+        name: 'Turtle Crawl',
         maxPoints: 5,
-        recommendedPoints: 2,
+        recommendedPoints: 1,
         priority: 'Optional',
-        description: 'Reduced flinch from damage',
-        benefit: '-10% flinch per point'
+        description: 'Take less damage when downed',
+        benefit: 'Damage reduction while DBNO',
+        isMajor: false
+      },
+      {
+        id: 'downed-but-determined',
+        name: 'Downed but Determined',
+        maxPoints: 5,
+        recommendedPoints: 1,
+        priority: 'Optional',
+        description: 'Increases bleed-out time',
+        benefit: '+5s bleed timer per point',
+        isMajor: false
+      },
+      {
+        id: 'proficient-pryer',
+        name: 'Proficient Pryer',
+        maxPoints: 5,
+        recommendedPoints: 3,
+        priority: 'High',
+        description: 'Faster breaching and prying speed',
+        benefit: '-10% breach time per point',
+        isMajor: false
       }
     ]
   }
 ];
 
-// Calculate total recommended points
 export const calculateRecommendedBuild = () => {
   let total = 0;
   const breakdown: { branch: string; points: number }[] = [];
@@ -281,36 +320,14 @@ export const calculateRecommendedBuild = () => {
   return { total, breakdown };
 };
 
-// Get skills by priority
-export const getSkillsByPriority = (priority: Skill['priority']) => {
-  const skills: (Skill & { branch: string })[] = [];
-
-  skillBranches.forEach(branch => {
-    branch.skills.forEach(skill => {
-      if (skill.priority === priority) {
-        skills.push({ ...skill, branch: branch.name });
-      }
-    });
-  });
-
-  return skills;
-};
-
-// Recommended unlock order for solo stealth build
 export const soloStealthBuildOrder = [
   { skillId: 'marathon-runner', points: 5, reason: 'Core mobility - escape danger' },
-  { skillId: 'youthful-lungs', points: 5, reason: 'More stamina for everything' },
-  { skillId: 'looters-instincts', points: 5, reason: 'Faster looting = less exposure' },
-  { skillId: 'silent-scavenger', points: 5, reason: 'Stay hidden while looting' },
-  { skillId: 'gentle-pressure', points: 5, reason: 'Silent breaching' },
-  { skillId: 'in-round-crafting', points: 1, reason: 'Craft healing mid-raid' },
-  { skillId: 'slip-and-slide', points: 3, reason: 'Quick escapes' },
-  { skillId: 'revitalizing-squat', points: 3, reason: 'Regen while hiding' },
-  { skillId: 'calming-stroll', points: 1, reason: 'Passive stamina regen' },
-  { skillId: 'sturdy-ankles', points: 1, reason: 'Safer drops' },
-  { skillId: 'survivors-stamina', points: 3, reason: 'Escape when hurt' },
-  { skillId: 'proficient-pryer', points: 2, reason: 'Faster breaching' },
-  { skillId: 'security-breach', points: 1, reason: 'Access locked containers' },
-  { skillId: 'carry-the-momentum', points: 1, reason: 'Smooth movement' },
-  { skillId: 'last-stand', points: 1, reason: 'Emergency survival' }
+  { skillId: 'youthful-lungs', points: 5, reason: 'More stamina is king' },
+  { skillId: 'looters-instincts', points: 5, reason: 'Less time looting = less time exposed' },
+  { skillId: 'in-round-crafting', points: 1, reason: 'Craft meds mid-raid' },
+  { skillId: 'used-to-the-weight', points: 3, reason: 'Offset heavy shield penalties' },
+  { skillId: 'survivors-stamina', points: 1, reason: 'Clutch escapes at low HP' },
+  { skillId: 'calming-stroll', points: 1, reason: 'Regen stamina without stopping' },
+  { skillId: 'broad-shoulders', points: 3, reason: 'Carry more loot out' },
+  { skillId: 'security-breach', points: 1, reason: 'Access high-tier red lockers' }
 ];

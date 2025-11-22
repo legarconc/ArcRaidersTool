@@ -1,8 +1,6 @@
 'use client';
 
-import { useCallback, useSyncExternalStore } from 'react';
-
-const storageSubscribers = new Map<string, Set<() => void>>();
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const readStorageValue = <T,>(key: string, initialValue: T): T => {
   if (typeof window === 'undefined') {
@@ -18,70 +16,45 @@ const readStorageValue = <T,>(key: string, initialValue: T): T => {
   }
 };
 
-const subscribeToLocalStorage = (key: string, onStoreChange: () => void) => {
-  if (typeof window === 'undefined') {
-    return () => {};
-  }
-
-  let subscribers = storageSubscribers.get(key);
-  if (!subscribers) {
-    subscribers = new Set();
-    storageSubscribers.set(key, subscribers);
-  }
-
-  subscribers.add(onStoreChange);
-
-  const handleStorage = (event: StorageEvent) => {
-    if (event.key === key || event.key === null) {
-      onStoreChange();
-    }
-  };
-
-  window.addEventListener('storage', handleStorage);
-
-  return () => {
-    subscribers?.delete(onStoreChange);
-    if (subscribers && subscribers.size === 0) {
-      storageSubscribers.delete(key);
-    }
-    window.removeEventListener('storage', handleStorage);
-  };
-};
-
-const notifySubscribers = (key: string) => {
-  const subscribers = storageSubscribers.get(key);
-  subscribers?.forEach((subscriber) => subscriber());
-};
-
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
-  const getSnapshot = useCallback(() => readStorageValue(key, initialValue), [key, initialValue]);
+  const initialRef = useRef(initialValue);
+  useEffect(() => {
+    initialRef.current = initialValue;
+  }, [initialValue]);
 
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      if (typeof window === 'undefined') {
-        return () => {};
-      }
-      return subscribeToLocalStorage(key, onStoreChange);
-    },
-    [key]
-  );
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-  const storedValue = useSyncExternalStore(subscribe, getSnapshot, () => initialValue);
+  useEffect(() => {
+    setStoredValue(readStorageValue(key, initialRef.current));
+  }, [key]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== key && event.key !== null) return;
+      setStoredValue(readStorageValue(key, initialRef.current));
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [key]);
 
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       try {
-        const valueToStore = value instanceof Function ? value(getSnapshot()) : value;
-        if (typeof window === 'undefined') {
-          return;
-        }
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        notifySubscribers(key);
+        setStoredValue(prev => {
+          const valueToStore = value instanceof Function ? value(prev) : value;
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          }
+          return valueToStore;
+        });
       } catch (error) {
         console.warn(`Error setting localStorage key "${key}":`, error);
       }
     },
-    [getSnapshot, key]
+    [key]
   );
 
   return [storedValue, setValue];
