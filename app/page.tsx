@@ -1,19 +1,22 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, CheckCircle, DollarSign, Recycle, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp } from 'lucide-react';
-import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag } from '@/lib/lootDb';
+import type { LucideIcon } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { workbenches, scrappyUpgrades, upgradeOrder } from '@/lib/workshopDb';
 import { skillBranches, calculateRecommendedBuild } from '@/lib/skillsDb';
 import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
 import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
+import { getMissionOptions, computeMissionPlan } from '@/lib/plannerDb';
 
-type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints';
+type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'planner';
 
-const statusStyles = {
+const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
   KEEP: { border: 'border-green-500', text: 'text-green-500', bg: 'bg-green-500/20', icon: CheckCircle },
   SELL: { border: 'border-red-500', text: 'text-red-500', bg: 'bg-red-500/20', icon: DollarSign },
-  RECYCLE: { border: 'border-blue-500', text: 'text-blue-500', bg: 'bg-blue-500/20', icon: Recycle }
+  RECYCLE: { border: 'border-blue-500', text: 'text-blue-500', bg: 'bg-blue-500/20', icon: Recycle },
+  USE: { border: 'border-amber-500', text: 'text-amber-400', bg: 'bg-amber-500/20', icon: Flame }
 };
 
 const rarityColors: Record<Rarity, string> = {
@@ -32,6 +35,8 @@ const locationTagColors: Record<LocationTag, string> = {
   Nature: 'bg-emerald-500/20 text-emerald-400',
   Medical: 'bg-pink-500/20 text-pink-400',
   Military: 'bg-slate-500/20 text-slate-400',
+  Topside: 'bg-orange-500/20 text-orange-400',
+  Crafting: 'bg-indigo-500/20 text-indigo-400',
   Various: 'bg-zinc-500/20 text-zinc-400'
 };
 
@@ -70,6 +75,9 @@ export default function Home() {
   const [blueprintFilter, setBlueprintFilter] = useState<'all' | 'owned' | 'missing'>('all');
   const [workbenchFilter, setWorkbenchFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
+  const missionOptions = getMissionOptions();
+  const [selectedMissionId, setSelectedMissionId] = useState<string>(missionOptions[0]?.id || '');
 
   // Filtered loot
   const filteredLoot = useMemo(() => {
@@ -93,6 +101,10 @@ export default function Home() {
 
   const blueprintStats = useMemo(() => getCollectionStats(ownedBlueprints), [ownedBlueprints]);
   const recommendedBuild = useMemo(() => calculateRecommendedBuild(), []);
+  const missionPlan = useMemo(() => {
+    if (!selectedMissionId) return null;
+    return computeMissionPlan(selectedMissionId, workshopLevels);
+  }, [selectedMissionId, workshopLevels]);
 
   // Export/Import handlers
   const handleExport = () => {
@@ -136,7 +148,8 @@ export default function Home() {
     { id: 'loot' as Tab, label: 'Loot Database', icon: Package },
     { id: 'workshop' as Tab, label: 'Workshop', icon: Wrench },
     { id: 'skills' as Tab, label: 'Skills', icon: Target },
-    { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen }
+    { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen },
+    { id: 'planner' as Tab, label: 'Planner', icon: MapPin }
   ];
 
   return (
@@ -197,6 +210,7 @@ export default function Home() {
                 <option value="KEEP">Keep</option>
                 <option value="SELL">Sell</option>
                 <option value="RECYCLE">Recycle</option>
+                <option value="USE">Use/Consume</option>
               </select>
               <select value={rarityFilter} onChange={e => setRarityFilter(e.target.value as typeof rarityFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
                 <option value="ALL">All Rarity</option>
@@ -215,6 +229,8 @@ export default function Home() {
                 <option value="Nature">Nature</option>
                 <option value="Medical">Medical</option>
                 <option value="Military">Military</option>
+                <option value="Topside">Topside</option>
+                <option value="Crafting">Crafting</option>
                 <option value="Various">Various</option>
               </select>
             </div>
@@ -228,6 +244,8 @@ export default function Home() {
                 const Icon = style.icon;
                 const rarity = getItemRarity(item);
                 const locationTag = getLocationTag(item);
+                const bestLocations = getBestMapLocations(item);
+                const isExpanded = expandedLootCard === item.name;
                 return (
                   <div key={i} className={`bg-zinc-800 rounded-lg p-4 border-l-4 ${style.border}`}>
                     <div className="flex justify-between items-start mb-2">
@@ -240,6 +258,32 @@ export default function Home() {
                     </div>
                     <p className="text-sm text-zinc-400 mb-2">{item.reason}</p>
                     <p className="text-xs text-zinc-500">{item.location}</p>
+                    {bestLocations.length > 0 && (
+                      <div className="mt-3 border-t border-zinc-700 pt-3">
+                        <button
+                          onClick={() => setExpandedLootCard(prev => (prev === item.name ? null : item.name))}
+                          className="w-full flex items-center justify-between text-xs font-semibold text-yellow-400"
+                        >
+                          <span className="flex items-center gap-1">
+                            <MapPin size={14} /> Best spots by map
+                          </span>
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                        {isExpanded && (
+                          <div className="mt-2 space-y-2">
+                            {bestLocations.map((loc, idx) => (
+                              <div key={`${loc.map}-${idx}`} className="bg-zinc-900/40 rounded-lg p-2 border border-zinc-700">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="font-semibold text-white">{loc.map}</span>
+                                  <span className="text-amber-400">{loc.hotspot}</span>
+                                </div>
+                                <p className="text-xs text-zinc-400 mt-1">{loc.tip}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -517,6 +561,132 @@ export default function Home() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* PLANNER TAB */}
+        {activeTab === 'planner' && (
+          <div className="space-y-6">
+            <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-yellow-500">Session Planner</h2>
+                  <p className="text-xs text-zinc-500">Pick a mission/upgrade to see the best solo farming route.</p>
+                </div>
+                <select
+                  value={selectedMissionId}
+                  onChange={e => setSelectedMissionId(e.target.value)}
+                  className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
+                >
+                  {missionOptions.map(mission => (
+                    <option key={mission.id} value={mission.id}>
+                      {mission.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {missionPlan && (
+                <div className="mt-4 border-t border-zinc-700 pt-4 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+                    <span className="text-white font-semibold">{missionPlan.mission.title}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${missionPlan.mission.type === 'upgrade' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}`}>
+                      {missionPlan.mission.type === 'upgrade' ? 'Upgrade' : 'Quest'}
+                    </span>
+                    {missionPlan.mission.target && (
+                      <span>
+                        Target: {workbenches.find(w => w.id === missionPlan.mission.target?.benchId)?.name} → L{missionPlan.mission.target?.targetLevel}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-zinc-500">{missionPlan.mission.description}</p>
+                  {missionPlan.isComplete && (
+                    <p className="text-xs text-green-400 font-semibold">Already completed with your current workshop levels.</p>
+                  )}
+                  {missionPlan.mission.rewardNote && (
+                    <p className="text-xs text-amber-400">Reward: {missionPlan.mission.rewardNote}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {missionPlan && !missionPlan.isComplete && (
+              <>
+                <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                  <h3 className="text-md font-semibold text-white mb-3">Required Materials</h3>
+                  {missionPlan.requirements.length === 0 ? (
+                    <p className="text-sm text-zinc-500">No materials needed. Head out and complete the mission objective.</p>
+                  ) : (
+                    <div className="overflow-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-xs text-zinc-500">
+                          <tr>
+                            <th className="text-left py-2">Item</th>
+                            <th className="text-left py-2">Qty</th>
+                            <th className="text-left py-2">Tag</th>
+                            <th className="text-left py-2">Best Map / Hotspot</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {missionPlan.requirements.map(req => {
+                            const bestSpot = req.bestSpots[0];
+                            return (
+                              <tr key={req.itemName} className="border-t border-zinc-700">
+                                <td className="py-2">
+                                  <p className="font-semibold text-white">{req.itemName}</p>
+                                  {req.note && <p className="text-xs text-zinc-500">{req.note}</p>}
+                                </td>
+                                <td className="py-2 text-zinc-400">x{req.quantity}</td>
+                                <td className="py-2">
+                                  {req.locationTag && (
+                                    <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
+                                      {req.locationTag}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-2 text-xs text-zinc-400">
+                                  {bestSpot ? (
+                                    <div>
+                                      <p className="text-white">{bestSpot.map} — {bestSpot.hotspot}</p>
+                                      <p className="text-zinc-500">{bestSpot.tip}</p>
+                                    </div>
+                                  ) : (
+                                    <span>Check loot database</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                  <h3 className="text-md font-semibold text-white mb-3">Suggested Route</h3>
+                  {missionPlan.routes.length === 0 ? (
+                    <p className="text-sm text-zinc-500">No hotspots found. Use the Loot tab to locate alternatives.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {missionPlan.routes.map(route => (
+                        <div key={route.map} className="bg-zinc-900/40 border border-zinc-700 rounded-lg p-3">
+                          <p className="text-sm font-semibold text-yellow-400 mb-2">{route.map}</p>
+                          <div className="space-y-2">
+                            {route.hotspots.map(h => (
+                              <div key={h.hotspot} className="text-xs">
+                                <p className="text-white font-semibold">{h.hotspot}</p>
+                                <p className="text-zinc-500 mb-1">{h.tip}</p>
+                                <p className="text-emerald-400">Farm: {h.items.join(', ')}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
       </main>

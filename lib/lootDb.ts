@@ -1,59 +1,98 @@
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Epic' | 'Legendary';
-export type LocationTag = 'ARC' | 'Industrial' | 'Residential' | 'Commercial' | 'Nature' | 'Medical' | 'Military' | 'Various';
+export type LocationTag =
+  | 'ARC'
+  | 'Industrial'
+  | 'Residential'
+  | 'Commercial'
+  | 'Nature'
+  | 'Medical'
+  | 'Military'
+  | 'Topside'
+  | 'Crafting'
+  | 'Various';
+export type ItemStatus = 'KEEP' | 'SELL' | 'RECYCLE' | 'USE';
+
+export interface MapLocation {
+  map: string;
+  hotspot: string;
+  tip: string;
+}
 
 export interface Item {
   name: string;
-  status: 'KEEP' | 'SELL' | 'RECYCLE';
+  status: ItemStatus;
   reason: string;
   location: string;
+  rarity: Rarity;
+  locationTag: LocationTag;
 }
 
-// Helper function to determine rarity based on item characteristics
+type BaseItem = Omit<Item, 'rarity' | 'locationTag'>;
+
 export function getItemRarity(item: Item): Rarity {
-  const name = item.name.toLowerCase();
-
-  // Legendary items
-  if (name.includes('queen') || name.includes('matriarch')) return 'Legendary';
-
-  // Epic items
-  if (name.includes('exodus') || name.includes('magnetic accelerator') ||
-      name.includes('advanced') || name.includes('power rod') ||
-      name.includes('mixtape') || name.includes('snow globe')) return 'Epic';
-
-  // Rare items - ARC parts, keys, refined materials
-  if (name.includes('driver') || name.includes('cell') || name.includes('vault') ||
-      name.includes('scanner') || name.includes('pulse unit') || name.includes('core') ||
-      name.includes('key') || name.includes('circuitry') || name.includes('components') ||
-      item.reason.includes('5,000') || item.reason.includes('3,000')) return 'Rare';
-
-  // Uncommon items
-  if (name.includes('arc ') || name.includes('gun parts') ||
-      name.includes('industrial') || name.includes('motor') ||
-      item.reason.includes('2,000') || item.reason.includes('upgrade')) return 'Uncommon';
-
-  // Common items
-  return 'Common';
+  return item.rarity;
 }
 
-// Helper function to determine location tag
 export function getLocationTag(item: Item): LocationTag {
-  const location = item.location.toLowerCase();
-  const name = item.name.toLowerCase();
+  return item.locationTag;
+}
 
-  if (location.includes('enemy') || location.includes('arc') ||
-      name.includes('driver') || name.includes('cell') || name.includes('pulse')) return 'ARC';
-  if (location.includes('industrial') || location.includes('factory') ||
-      location.includes('garage')) return 'Industrial';
-  if (location.includes('house') || location.includes('residential') ||
-      location.includes('kitchen')) return 'Residential';
-  if (location.includes('commercial') || location.includes('store') ||
-      location.includes('shop')) return 'Commercial';
-  if (location.includes('nature') || location.includes('grove') ||
-      location.includes('tree') || name.includes('fruit')) return 'Nature';
-  if (location.includes('medical') || location.includes('hospital')) return 'Medical';
-  if (location.includes('military') || location.includes('security')) return 'Military';
+const mapLocationGuides: Record<LocationTag, MapLocation[]> = {
+  ARC: [
+    { map: 'Blue Gate', hotspot: 'ARC invasion crash sites', tip: 'Follow fresh smoke plumes near the ARC dropships for Leaper/Snitch parts.' },
+    { map: 'Buried City', hotspot: 'Collapsed metro approaches', tip: 'Rocketeer and Hornet patrols loop around the sunken train yard.' },
+    { map: 'Dam & Highlands', hotspot: 'Radars around the dam spillway', tip: 'Surveyor clusters scan the valley—great for Vaults and Cells.' }
+  ],
+  Industrial: [
+    { map: 'Blue Gate', hotspot: 'Old Refinery POIs', tip: 'Factory Row containers chain-spawn Rusted Tools and Motors.' },
+    { map: 'Buried City', hotspot: 'Underpass workshops', tip: 'Search maintenance rooms tucked under the freeway supports.' },
+    { map: 'Dam & Highlands', hotspot: 'Construction staging area', tip: 'The crane site west of the dam has dense industrial loot.' }
+  ],
+  Residential: [
+    { map: 'Blue Gate', hotspot: 'Olive Grove villas', tip: 'Kitchen pantries restock fruit needed for Scrappy upgrades.' },
+    { map: 'Buried City', hotspot: 'Apartment blocks', tip: 'Hit the top floors for medical cabinets and household parts.' },
+    { map: 'Topside Outskirts', hotspot: 'Suburban cul-de-sacs', tip: 'Low-risk houses—good for quick solo runs.' }
+  ],
+  Commercial: [
+    { map: 'Blue Gate', hotspot: 'Marketplace strip', tip: 'Sports and electronics stores yield gun parts and attachments.' },
+    { map: 'Buried City', hotspot: 'Downtown arcades', tip: 'High shelf density means multiple locked cash registers per run.' },
+    { map: 'Topside Outskirts', hotspot: 'Service stations', tip: 'Great for chemicals and easy hornet encounters.' }
+  ],
+  Nature: [
+    { map: 'Blue Gate', hotspot: 'Olive Grove gardens', tip: 'Guaranteed olives, lemons, and apricots around irrigation lines.' },
+    { map: 'Buried City', hotspot: 'Cactus ridge', tip: 'Prickly Pear and agave line the canyon edges.' },
+    { map: 'Dam & Highlands', hotspot: 'Mossy creeks', tip: 'Mushrooms cluster under the dam-side pines.' }
+  ],
+  Medical: [
+    { map: 'Blue Gate', hotspot: 'Field hospital tents', tip: 'Med crates respawn quickly when public events rotate.' },
+    { map: 'Buried City', hotspot: 'Metro infirmary', tip: 'Combined with ARC pressure, expect lots of Surveyors—bring stealth.' },
+    { map: 'Dam & Highlands', hotspot: 'Rescue outpost', tip: 'A small POI north of the dam packed with bioscanners.' }
+  ],
+  Military: [
+    { map: 'Blue Gate', hotspot: 'Command bunker', tip: 'Security lockers for Bastion Cells and ARC Motion Cores.' },
+    { map: 'Buried City', hotspot: 'Checkpoint Sigma', tip: 'Sentinel convoys for firing cores and cores.' },
+    { map: 'Dam & Highlands', hotspot: 'AA battery hill', tip: 'Spotter and Bombardier patrols constantly rotate through.' }
+  ],
+  Topside: [
+    { map: 'Topside Outskirts', hotspot: 'Landing Strips', tip: 'Sprint along the ARC landing strips for electronics-heavy containers.' },
+    { map: 'Topside Outskirts', hotspot: 'Derelict Convoys', tip: 'Broken caravans scatter wires, batteries, and springs along the road.' },
+    { map: 'Topside Outskirts', hotspot: 'Collapsed Freeway Apex', tip: 'Great for mixed civilian crates without ARC pressure.' }
+  ],
+  Crafting: [
+    { map: 'Base Camp', hotspot: 'Refiner Station', tip: 'Convert bulk Metal/Plastic/Rubber into advanced components.' },
+    { map: 'Base Camp', hotspot: 'Workshop Row', tip: 'Queue conversions before raids to minimize downtime.' },
+    { map: 'Base Camp', hotspot: 'Recycler Alley', tip: 'Break down junk loot to feed the Refiner and crafting queues.' }
+  ],
+  Various: [
+    { map: 'Blue Gate', hotspot: 'Scrappy drop site', tip: 'General containers, good catch-all for odd requests.' },
+    { map: 'Buried City', hotspot: 'Collapsed freeway apex', tip: 'Mixed spawns of residential and industrial loot.' },
+    { map: 'Topside Outskirts', hotspot: 'Abandoned camps', tip: 'Low pressure area to finish off remaining checklists.' }
+  ]
+};
 
-  return 'Various';
+export function getBestMapLocations(item: Item): MapLocation[] {
+  const tag = getLocationTag(item);
+  return mapLocationGuides[tag] || [];
 }
 
 // Filter functions
@@ -82,7 +121,7 @@ export function searchItems(items: Item[], query: string): Item[] {
   );
 }
 
-export const lootDb: Item[] = [
+const rawLootDb: BaseItem[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   // KEEP - ARC ENEMY PARTS (Quest & Upgrade Essential)
   // ═══════════════════════════════════════════════════════════════════════════
@@ -280,11 +319,11 @@ export const lootDb: Item[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   // SELL - TRINKETS (Low Value - $1000)
   // ═══════════════════════════════════════════════════════════════════════════
-  { name: 'Bloated Tuna Can', status: 'SELL', reason: 'Restores stamina, sells for 1,000₡', location: 'Various containers' },
+  { name: 'Bloated Tuna Can', status: 'USE', reason: 'Restores stamina, sells for 1,000₡', location: 'Various containers' },
   { name: 'Coffee Pot', status: 'SELL', reason: 'Common trinket, sells for 1,000₡', location: 'Houses, offices' },
-  { name: 'Empty Wine Bottle', status: 'SELL', reason: 'Crafts Agave Juice, sells for 1,000₡', location: 'Houses, bars' },
-  { name: 'Expired Pasta', status: 'SELL', reason: 'Restores health, sells for 1,000₡', location: 'Houses, stores' },
-  { name: 'Rubber Duck', status: 'SELL', reason: 'Can be thrown as distraction, sells for 1,000₡', location: 'Houses' },
+  { name: 'Empty Wine Bottle', status: 'USE', reason: 'Crafts Agave Juice, sells for 1,000₡', location: 'Houses, bars' },
+  { name: 'Expired Pasta', status: 'USE', reason: 'Restores health, sells for 1,000₡', location: 'Houses, stores' },
+  { name: 'Rubber Duck', status: 'USE', reason: 'Can be thrown as distraction, sells for 1,000₡', location: 'Houses' },
   { name: 'Torn Book', status: 'SELL', reason: 'Common trinket, sells for 1,000₡', location: 'Houses, libraries' },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -387,3 +426,226 @@ export const lootDb: Item[] = [
   { name: 'Torn Blanket', status: 'RECYCLE', reason: 'Yields fabric parts', location: 'Houses' },
   { name: 'Unusable Weapon', status: 'RECYCLE', reason: 'Yields metal/mechanical parts', location: 'Various locations' },
 ];
+
+const lootMetadata: Record<string, { rarity: Rarity; locationTag: LocationTag }> = {
+  'Leaper Pulse Unit': { rarity: 'Rare', locationTag: 'ARC' },
+  'Rocketeer Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Surveyor Vault': { rarity: 'Rare', locationTag: 'ARC' },
+  'Hornet Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Wasp Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Snitch Scanner': { rarity: 'Rare', locationTag: 'ARC' },
+  'Spotter Relay': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Bastion Cell': { rarity: 'Rare', locationTag: 'ARC' },
+  'Bombardier Cell': { rarity: 'Rare', locationTag: 'ARC' },
+  'Sentinel Firing Core': { rarity: 'Rare', locationTag: 'ARC' },
+  'Tick Pod': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Fireball Burner': { rarity: 'Common', locationTag: 'ARC' },
+  'Pop Trigger': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Queen Reactor': { rarity: 'Legendary', locationTag: 'ARC' },
+  'Matriarch Reactor': { rarity: 'Legendary', locationTag: 'ARC' },
+  'Power Rod': { rarity: 'Epic', locationTag: 'ARC' },
+  'Shredder Gyro': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Gyroscope': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Alloy': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Advanced Electrical Components': { rarity: 'Epic', locationTag: 'Crafting' },
+  'Advanced Mechanical Components': { rarity: 'Epic', locationTag: 'Crafting' },
+  'Mod Components': { rarity: 'Rare', locationTag: 'Various' },
+  'Exodus Modules': { rarity: 'Epic', locationTag: 'Various' },
+  'Magnetic Accelerator': { rarity: 'Epic', locationTag: 'ARC' },
+  'ARC Circuitry': { rarity: 'Rare', locationTag: 'ARC' },
+  'ARC Motion Core': { rarity: 'Rare', locationTag: 'ARC' },
+  'ARC Powercell': { rarity: 'Rare', locationTag: 'ARC' },
+  'Advanced ARC Powercell': { rarity: 'Epic', locationTag: 'ARC' },
+  'Electrical Components': { rarity: 'Rare', locationTag: 'Industrial' },
+  'Mechanical Components': { rarity: 'Rare', locationTag: 'Crafting' },
+  'Antiseptic': { rarity: 'Common', locationTag: 'Medical' },
+  'Crude Explosives': { rarity: 'Common', locationTag: 'Crafting' },
+  'Durable Cloth': { rarity: 'Common', locationTag: 'Crafting' },
+  'Explosive Compound': { rarity: 'Common', locationTag: 'Crafting' },
+  'Metal Parts': { rarity: 'Common', locationTag: 'Various' },
+  'Plastic Parts': { rarity: 'Common', locationTag: 'Various' },
+  'Rubber Parts': { rarity: 'Common', locationTag: 'Various' },
+  'Fabric': { rarity: 'Common', locationTag: 'Residential' },
+  'Chemicals': { rarity: 'Common', locationTag: 'Industrial' },
+  'Battery': { rarity: 'Common', locationTag: 'Topside' },
+  'Wires': { rarity: 'Common', locationTag: 'Topside' },
+  'Steel Spring': { rarity: 'Common', locationTag: 'Topside' },
+  'Sensors': { rarity: 'Common', locationTag: 'ARC' },
+  'Magnet': { rarity: 'Common', locationTag: 'Topside' },
+  'Oil': { rarity: 'Common', locationTag: 'Topside' },
+  'Processor': { rarity: 'Common', locationTag: 'Topside' },
+  'Voltage Converter': { rarity: 'Common', locationTag: 'Topside' },
+  'Syringe': { rarity: 'Common', locationTag: 'Medical' },
+  'Synthesized Fuel': { rarity: 'Common', locationTag: 'Industrial' },
+  'Speaker Component': { rarity: 'Common', locationTag: 'Topside' },
+  'Canister': { rarity: 'Common', locationTag: 'Topside' },
+  'Duct Tape': { rarity: 'Common', locationTag: 'Topside' },
+  'Rope': { rarity: 'Common', locationTag: 'Topside' },
+  'Simple Gun Parts': { rarity: 'Uncommon', locationTag: 'Commercial' },
+  'Light Gun Parts': { rarity: 'Uncommon', locationTag: 'Commercial' },
+  'Medium Gun Parts': { rarity: 'Uncommon', locationTag: 'Commercial' },
+  'Heavy Gun Parts': { rarity: 'Uncommon', locationTag: 'Commercial' },
+  'Complex Gun Parts': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Great Mullein': { rarity: 'Common', locationTag: 'Nature' },
+  'Fertilizer': { rarity: 'Common', locationTag: 'Nature' },
+  'Apricot': { rarity: 'Uncommon', locationTag: 'Nature' },
+  'Lemon': { rarity: 'Uncommon', locationTag: 'Nature' },
+  'Mushroom': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Olives': { rarity: 'Uncommon', locationTag: 'Nature' },
+  'Prickly Pear': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Agave': { rarity: 'Common', locationTag: 'Various' },
+  'Assorted Seeds': { rarity: 'Common', locationTag: 'Nature' },
+  'Moss': { rarity: 'Common', locationTag: 'Topside' },
+  'Resin': { rarity: 'Common', locationTag: 'Nature' },
+  'Roots': { rarity: 'Common', locationTag: 'Nature' },
+  'Water Pump': { rarity: 'Common', locationTag: 'Industrial' },
+  'Cooling Fan': { rarity: 'Common', locationTag: 'Industrial' },
+  'Cracked Bioscanner': { rarity: 'Rare', locationTag: 'Medical' },
+  'Damaged Heat Sink': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Fried Motherboard': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Industrial Battery': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Laboratory Reagents': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Motor': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Power Cable': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Rusted Gears': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Rusted Gear': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Rusted Shut Medical Kit': { rarity: 'Uncommon', locationTag: 'Medical' },
+  'Rusted Tools': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Toaster': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Humidifier': { rarity: 'Common', locationTag: 'Residential' },
+  'Dog Collar': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Cat Bed': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Very Comfortable Pillow': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Light Bulb': { rarity: 'Common', locationTag: 'Residential' },
+  'Flow Controller': { rarity: 'Common', locationTag: 'Various' },
+  'Magnetron': { rarity: 'Common', locationTag: 'Various' },
+  'Ion Sputter': { rarity: 'Common', locationTag: 'Various' },
+  'Geiger Counter': { rarity: 'Common', locationTag: 'Industrial' },
+  'Blue Gate Communication Tower Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Blue Gate Confiscation Room Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Blue Gate Cellar Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Blue Gate Village Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Buried City Hospital Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Buried City JKV Employee Access Card': { rarity: 'Common', locationTag: 'Various' },
+  'Buried City Residential Mastery Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Buried City Town Hall Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Dam Control Tower Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Dam Staff Room Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Dam Surveillance Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Dam Testing Annex Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Dam Utility Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Patrol Car Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Raider Hatch Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Spaceport Container Storage Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Spaceport Control Tower Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Spaceport Trench Tower Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Spaceport Warehouse Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Stella Montis Archives Key': { rarity: 'Rare', locationTag: 'ARC' },
+  'Stella Montis Assembly Admin Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Stella Montis Medical Storage Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Stella Montis Security Checkpoint Key': { rarity: 'Rare', locationTag: 'Various' },
+  'Volcanic Rock': { rarity: 'Common', locationTag: 'Various' },
+  'Lance\'s Mixtape (5th Edition)': { rarity: 'Epic', locationTag: 'Various' },
+  'Breathtaking Snow Globe': { rarity: 'Epic', locationTag: 'Residential' },
+  'Playing Cards': { rarity: 'Rare', locationTag: 'Residential' },
+  'Red Coral Jewelry': { rarity: 'Rare', locationTag: 'Various' },
+  'Music Box': { rarity: 'Rare', locationTag: 'Residential' },
+  'Fine Wristwatch': { rarity: 'Rare', locationTag: 'Various' },
+  'Music Album': { rarity: 'Rare', locationTag: 'Residential' },
+  'Silver Teaspoon Set': { rarity: 'Rare', locationTag: 'Residential' },
+  'Statuette': { rarity: 'Rare', locationTag: 'Various' },
+  'Vase': { rarity: 'Rare', locationTag: 'Residential' },
+  'Air Freshener': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Dart Board': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Film Reel': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Painted Box': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Poster of Natural Wonders': { rarity: 'Uncommon', locationTag: 'Residential' },
+  'Pottery': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Rosary': { rarity: 'Uncommon', locationTag: 'Various' },
+  'Bloated Tuna Can': { rarity: 'Common', locationTag: 'Various' },
+  'Coffee Pot': { rarity: 'Common', locationTag: 'Residential' },
+  'Empty Wine Bottle': { rarity: 'Common', locationTag: 'Residential' },
+  'Expired Pasta': { rarity: 'Common', locationTag: 'Residential' },
+  'Rubber Duck': { rarity: 'Common', locationTag: 'Residential' },
+  'Torn Book': { rarity: 'Common', locationTag: 'Residential' },
+  'Faded Photograph': { rarity: 'Common', locationTag: 'Residential' },
+  'Damaged Hornet Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged Wasp Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged Rocketeer Driver': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged Snitch Scanner': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged Tick Pod': { rarity: 'Common', locationTag: 'ARC' },
+  'Damaged ARC Motion Core': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged ARC Powercell': { rarity: 'Rare', locationTag: 'ARC' },
+  'Damaged Fireball Burner': { rarity: 'Common', locationTag: 'ARC' },
+  'Burned ARC Circuitry': { rarity: 'Rare', locationTag: 'ARC' },
+  'Rusty ARC Steel': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Degraded ARC Rubber': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Dried-Out ARC Resin': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Impure ARC Coolant': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Tattered ARC Lining': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Coolant': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Flex Rubber': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Performance Steel': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Synthetic Resin': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'ARC Thermo Lining': { rarity: 'Uncommon', locationTag: 'ARC' },
+  'Broken Flashlight': { rarity: 'Common', locationTag: 'Various' },
+  'Broken Guidance System': { rarity: 'Common', locationTag: 'ARC' },
+  'Broken Handheld Radio': { rarity: 'Common', locationTag: 'Various' },
+  'Broken Taser': { rarity: 'Common', locationTag: 'Military' },
+  'Blown Fuses': { rarity: 'Common', locationTag: 'Various' },
+  'Remote Control': { rarity: 'Common', locationTag: 'Residential' },
+  'Portable TV': { rarity: 'Common', locationTag: 'Residential' },
+  'Projector': { rarity: 'Common', locationTag: 'Residential' },
+  'Headphones': { rarity: 'Common', locationTag: 'Various' },
+  'Thermostat': { rarity: 'Common', locationTag: 'Residential' },
+  'Frequency Modulation Box': { rarity: 'Common', locationTag: 'Industrial' },
+  'Rotary Encoder': { rarity: 'Common', locationTag: 'Industrial' },
+  'Signal Amplifier': { rarity: 'Common', locationTag: 'Industrial' },
+  'Spectrum Analyzer': { rarity: 'Common', locationTag: 'Industrial' },
+  'Telemetry Transceiver': { rarity: 'Common', locationTag: 'Industrial' },
+  'Power Bank': { rarity: 'Common', locationTag: 'Various' },
+  'Sample Cleaner': { rarity: 'Common', locationTag: 'Various' },
+  'Alarm Clock': { rarity: 'Common', locationTag: 'Residential' },
+  'Bicycle Pump': { rarity: 'Common', locationTag: 'Industrial' },
+  'Cooling Coil': { rarity: 'Common', locationTag: 'Industrial' },
+  'Industrial Charger': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Industrial Magnet': { rarity: 'Uncommon', locationTag: 'Industrial' },
+  'Rocket Thruster': { rarity: 'Common', locationTag: 'ARC' },
+  'Spring Cushion': { rarity: 'Common', locationTag: 'Residential' },
+  'Turbo Pump': { rarity: 'Common', locationTag: 'Industrial' },
+  'Water Filter': { rarity: 'Common', locationTag: 'Residential' },
+  'Rusted Bolts': { rarity: 'Common', locationTag: 'Industrial' },
+  'Metal Brackets': { rarity: 'Common', locationTag: 'Industrial' },
+  'Camera Lens': { rarity: 'Common', locationTag: 'Various' },
+  'Candle Holder': { rarity: 'Common', locationTag: 'Residential' },
+  'Frying Pan': { rarity: 'Common', locationTag: 'Residential' },
+  'Garlic Press': { rarity: 'Common', locationTag: 'Residential' },
+  'Ice Cream Scooper': { rarity: 'Common', locationTag: 'Residential' },
+  'Number Plate': { rarity: 'Common', locationTag: 'Industrial' },
+  'Rubber Pad': { rarity: 'Common', locationTag: 'Various' },
+  'Household Cleaner': { rarity: 'Common', locationTag: 'Residential' },
+  'Crumpled Plastic Bottle': { rarity: 'Common', locationTag: 'Various' },
+  'Deflated Football': { rarity: 'Common', locationTag: 'Residential' },
+  'Diving Goggles': { rarity: 'Common', locationTag: 'Various' },
+  'Expired Respirator': { rarity: 'Common', locationTag: 'Industrial' },
+  'Polluted Air Filter': { rarity: 'Common', locationTag: 'Industrial' },
+  'Ripped Safety Vest': { rarity: 'Common', locationTag: 'Industrial' },
+  'Ruined Accordion': { rarity: 'Common', locationTag: 'Residential' },
+  'Ruined Augment': { rarity: 'Common', locationTag: 'ARC' },
+  'Ruined Baton': { rarity: 'Common', locationTag: 'Military' },
+  'Ruined Handcuffs': { rarity: 'Common', locationTag: 'Military' },
+  'Ruined Parachute': { rarity: 'Common', locationTag: 'Various' },
+  'Ruined Tactical Vest': { rarity: 'Common', locationTag: 'Military' },
+  'Ruined Riot Shield': { rarity: 'Common', locationTag: 'Military' },
+  'Tattered Clothes': { rarity: 'Common', locationTag: 'Residential' },
+  'Torn Blanket': { rarity: 'Common', locationTag: 'Residential' },
+  'Unusable Weapon': { rarity: 'Common', locationTag: 'Various' },
+} as const;
+
+export const lootDb: Item[] = rawLootDb.map(item => {
+  const meta = lootMetadata[item.name];
+  if (!meta) {
+    throw new Error(`Missing metadata for loot item "${item.name}"`);
+  }
+  return { ...item, ...meta };
+});
