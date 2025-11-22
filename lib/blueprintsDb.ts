@@ -26,6 +26,17 @@ export const blueprints: Blueprint[] = [
     soloNote: 'S-Tier. Hits harder than most rifles. Very ammo efficient.'
   },
   {
+    id: 'stitcher',
+    name: 'Stitcher SMG',
+    workbench: 'gunsmith',
+    requiredLevel: 1,
+    type: 'Weapon',
+    rarity: 'Common',
+    priority: 'High Value',
+    description: 'Reliable starter SMG with cheap ammo economy.',
+    soloNote: 'Budget spray weapon for early solos until you unlock Tempest.'
+  },
+  {
     id: 'renegade',
     name: 'Renegade Battle Rifle',
     workbench: 'gunsmith',

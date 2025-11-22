@@ -2,15 +2,17 @@
 
 import { useState, useMemo } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin, Flag } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { workbenches, scrappyUpgrades, upgradeOrder } from '@/lib/workshopDb';
 import { skillBranches, calculateRecommendedBuild } from '@/lib/skillsDb';
 import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
 import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
-import { getMissionOptions, computeMissionPlan, MissionType, getBenchDisplayName } from '@/lib/plannerDb';
+import { getMissionOptions, computeMissionPlan, MissionType, getBenchDisplayName, type Mission } from '@/lib/plannerDb';
+import { ProgressionTab } from '@/components/ProgressionTab';
+import type { ProgressionTask } from '@/lib/progressionDb';
 
-type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'planner';
+type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'progression' | 'planner';
 
 const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
   KEEP: { border: 'border-green-500', text: 'text-green-500', bg: 'bg-green-500/20', icon: CheckCircle },
@@ -67,6 +69,7 @@ export default function Home() {
     'gunsmith': 1, 'gear-bench': 1, 'medical-lab': 1, 'utility-station': 1, 'explosives-station': 1, 'refiner': 1
   });
   const [scrappyLevel, setScrappyLevel] = useLocalStorage<number>('arc-scrappy-level', 1);
+  const [progressionState, setProgressionState] = useLocalStorage<Record<string, boolean>>('arc-progression-state', {});
 
   // Skills tab state
   const [playerLevel, setPlayerLevel] = useLocalStorage<number>('arc-player-level', 1);
@@ -80,6 +83,16 @@ export default function Home() {
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
   const [plannerCategory, setPlannerCategory] = useState<MissionType>('upgrade');
   const [selectedMissionId, setSelectedMissionId] = useState<string>(missionCollections.upgradeMissions[0]?.id || '');
+  const missionLookup = useMemo(() => {
+    const map: Record<string, Mission> = {};
+    missionCollections.upgradeMissions.forEach(mission => {
+      map[mission.id] = mission;
+    });
+    missionCollections.questMissions.forEach(mission => {
+      map[mission.id] = mission;
+    });
+    return map;
+  }, []);
 
   const handlePlannerCategoryChange = (type: MissionType) => {
     if (type === plannerCategory) return;
@@ -118,6 +131,21 @@ export default function Home() {
   const targetBenchLabel = missionPlan?.mission.target
     ? getBenchDisplayName(missionPlan.mission.target.benchId)
     : undefined;
+
+  const handleProgressionToggle = (taskKey: string, checked: boolean) => {
+    setProgressionState(prev => ({ ...prev, [taskKey]: checked }));
+  };
+
+  const handleProgressionPlannerFocus = (task: ProgressionTask) => {
+    const mission = missionLookup[task.targetId];
+    if (!mission) {
+      alert('No planner entry available for this task yet.');
+      return;
+    }
+    setPlannerCategory(mission.type);
+    setSelectedMissionId(mission.id);
+    setActiveTab('planner');
+  };
 
   // Export/Import handlers
   const handleExport = () => {
@@ -162,6 +190,7 @@ export default function Home() {
     { id: 'workshop' as Tab, label: 'Workshop', icon: Wrench },
     { id: 'skills' as Tab, label: 'Skills', icon: Target },
     { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen },
+    { id: 'progression' as Tab, label: 'Progression', icon: Flag },
     { id: 'planner' as Tab, label: 'Planner', icon: MapPin }
   ];
 
@@ -575,6 +604,14 @@ export default function Home() {
               })}
             </div>
           </div>
+        )}
+
+        {activeTab === 'progression' && (
+          <ProgressionTab
+            completionState={progressionState}
+            onToggleTask={handleProgressionToggle}
+            onNavigateToPlanner={handleProgressionPlannerFocus}
+          />
         )}
 
         {/* PLANNER TAB */}

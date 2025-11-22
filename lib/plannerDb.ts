@@ -127,6 +127,18 @@ export interface MissionPlan {
 
 const questMissions: Mission[] = [
   {
+    id: 'quest-picking-up-the-pieces',
+    type: 'quest',
+    title: 'Quest: Picking up the Pieces',
+    description: 'Restore broken trading lines by hauling salvage back to Haven.',
+    requirements: [
+      { itemName: 'Rusted Tools', quantity: 4 },
+      { itemName: 'Metal Parts', quantity: 25 },
+      { itemName: 'Electrical Components', quantity: 3 }
+    ],
+    rewardNote: 'Unlocks basic trading posts in the Hub'
+  },
+  {
     id: 'quest-unexpected-initiative',
     type: 'quest',
     title: 'Quest: Unexpected Initiative',
@@ -148,6 +160,18 @@ const questMissions: Mission[] = [
       { itemName: 'Syringe', quantity: 3 }
     ],
     rewardNote: 'Unlocks advanced med crafting + camp XP'
+  },
+  {
+    id: 'quest-trash-into-treasure',
+    type: 'quest',
+    title: 'Quest: Trash Into Treasure',
+    description: 'Convert scavenged junk into usable crafting stock for the camp.',
+    requirements: [
+      { itemName: 'Mechanical Components', quantity: 6 },
+      { itemName: 'Rubber Parts', quantity: 20 },
+      { itemName: 'Synthesized Fuel', quantity: 2 }
+    ],
+    rewardNote: 'Unlocks refined crafting materials + trader stock'
   },
   {
     id: 'quest-expedition-prep',
