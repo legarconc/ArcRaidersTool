@@ -8,7 +8,7 @@ import { workbenches, scrappyUpgrades, upgradeOrder } from '@/lib/workshopDb';
 import { skillBranches, calculateRecommendedBuild } from '@/lib/skillsDb';
 import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
 import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
-import { getMissionOptions, computeMissionPlan } from '@/lib/plannerDb';
+import { getMissionOptions, computeMissionPlan, MissionType, getBenchDisplayName } from '@/lib/plannerDb';
 
 type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'planner';
 
@@ -51,6 +51,8 @@ const priorityColors: Record<string, string> = {
   'Low Priority': 'text-zinc-400 bg-zinc-500/20'
 };
 
+const missionCollections = getMissionOptions();
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('loot');
 
@@ -76,8 +78,15 @@ export default function Home() {
   const [workbenchFilter, setWorkbenchFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
-  const missionOptions = getMissionOptions();
-  const [selectedMissionId, setSelectedMissionId] = useState<string>(missionOptions[0]?.id || '');
+  const [plannerCategory, setPlannerCategory] = useState<MissionType>('upgrade');
+  const [selectedMissionId, setSelectedMissionId] = useState<string>(missionCollections.upgradeMissions[0]?.id || '');
+
+  const handlePlannerCategoryChange = (type: MissionType) => {
+    if (type === plannerCategory) return;
+    setPlannerCategory(type);
+    const list = type === 'upgrade' ? missionCollections.upgradeMissions : missionCollections.questMissions;
+    setSelectedMissionId(list[0]?.id || '');
+  };
 
   // Filtered loot
   const filteredLoot = useMemo(() => {
@@ -103,8 +112,12 @@ export default function Home() {
   const recommendedBuild = useMemo(() => calculateRecommendedBuild(), []);
   const missionPlan = useMemo(() => {
     if (!selectedMissionId) return null;
-    return computeMissionPlan(selectedMissionId, workshopLevels);
-  }, [selectedMissionId, workshopLevels]);
+    return computeMissionPlan(selectedMissionId, workshopLevels, scrappyLevel);
+  }, [selectedMissionId, workshopLevels, scrappyLevel]);
+
+  const targetBenchLabel = missionPlan?.mission.target
+    ? getBenchDisplayName(missionPlan.mission.target.benchId)
+    : undefined;
 
   // Export/Import handlers
   const handleExport = () => {
@@ -572,18 +585,51 @@ export default function Home() {
                 <div>
                   <h2 className="text-lg font-bold text-yellow-500">Session Planner</h2>
                   <p className="text-xs text-zinc-500">Pick a mission/upgrade to see the best solo farming route.</p>
+                  <div className="flex gap-2 mt-3">
+                    {(['upgrade', 'quest'] as MissionType[]).map(type => (
+                      <button
+                        key={type}
+                        onClick={() => handlePlannerCategoryChange(type)}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                          plannerCategory === type
+                            ? 'border-yellow-500 text-yellow-400 bg-yellow-500/10'
+                            : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
+                        }`}
+                      >
+                        {type === 'upgrade' ? 'Upgrades' : 'Quests'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <select
-                  value={selectedMissionId}
-                  onChange={e => setSelectedMissionId(e.target.value)}
-                  className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
-                >
-                  {missionOptions.map(mission => (
-                    <option key={mission.id} value={mission.id}>
-                      {mission.title}
-                    </option>
-                  ))}
-                </select>
+                {plannerCategory === 'upgrade' ? (
+                  <select
+                    value={selectedMissionId}
+                    onChange={e => setSelectedMissionId(e.target.value)}
+                    className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
+                  >
+                    {missionCollections.upgradeGroups.map(group => (
+                      <optgroup key={group.id} label={group.label}>
+                        {group.missions.map(mission => (
+                          <option key={mission.id} value={mission.id}>
+                            {mission.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    value={selectedMissionId}
+                    onChange={e => setSelectedMissionId(e.target.value)}
+                    className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
+                  >
+                    {missionCollections.questMissions.map(mission => (
+                      <option key={mission.id} value={mission.id}>
+                        {mission.title}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
               {missionPlan && (
                 <div className="mt-4 border-t border-zinc-700 pt-4 space-y-2">
@@ -592,9 +638,9 @@ export default function Home() {
                     <span className={`text-xs px-2 py-0.5 rounded ${missionPlan.mission.type === 'upgrade' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}`}>
                       {missionPlan.mission.type === 'upgrade' ? 'Upgrade' : 'Quest'}
                     </span>
-                    {missionPlan.mission.target && (
+                    {missionPlan.mission.target && targetBenchLabel && (
                       <span>
-                        Target: {workbenches.find(w => w.id === missionPlan.mission.target?.benchId)?.name} → L{missionPlan.mission.target?.targetLevel}
+                        Target: {targetBenchLabel} → L{missionPlan.mission.target.targetLevel}
                       </span>
                     )}
                   </div>
