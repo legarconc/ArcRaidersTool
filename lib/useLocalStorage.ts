@@ -68,6 +68,7 @@ export interface AppData {
   scrappyLevel: number;
   ownedBlueprints: string[];
   playerLevel: number;
+  completedMissions?: string[]; // Optional for backwards compatibility
 }
 
 export function exportData(data: AppData): string {

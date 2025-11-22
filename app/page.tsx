@@ -2,17 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin, Flag } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin, Route } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { workbenches, scrappyUpgrades, upgradeOrder } from '@/lib/workshopDb';
 import { skillBranches, calculateRecommendedBuild } from '@/lib/skillsDb';
 import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
 import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
-import { getMissionOptions, computeMissionPlan, MissionType, getBenchDisplayName, type Mission } from '@/lib/plannerDb';
-import { ProgressionTab } from '@/components/ProgressionTab';
-import type { ProgressionTask } from '@/lib/progressionDb';
+import { RoadmapTab } from '@/components/RoadmapTab';
 
-type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'progression' | 'planner';
+type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'roadmap';
 
 const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
   KEEP: { border: 'border-green-500', text: 'text-green-500', bg: 'bg-green-500/20', icon: CheckCircle },
@@ -53,10 +51,8 @@ const priorityColors: Record<string, string> = {
   'Low Priority': 'text-zinc-400 bg-zinc-500/20'
 };
 
-const missionCollections = getMissionOptions();
-
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('loot');
+  const [activeTab, setActiveTab] = useState<Tab>('roadmap');
 
   // Loot tab state
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,7 +65,7 @@ export default function Home() {
     'gunsmith': 1, 'gear-bench': 1, 'medical-lab': 1, 'utility-station': 1, 'explosives-station': 1, 'refiner': 1
   });
   const [scrappyLevel, setScrappyLevel] = useLocalStorage<number>('arc-scrappy-level', 1);
-  const [progressionState, setProgressionState] = useLocalStorage<Record<string, boolean>>('arc-progression-state', {});
+  const [completedMissions, setCompletedMissions] = useLocalStorage<string[]>('arc-roadmap-missions', []);
 
   // Skills tab state
   const [playerLevel, setPlayerLevel] = useLocalStorage<number>('arc-player-level', 1);
@@ -81,24 +77,14 @@ export default function Home() {
   const [workbenchFilter, setWorkbenchFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
-  const [plannerCategory, setPlannerCategory] = useState<MissionType>('upgrade');
-  const [selectedMissionId, setSelectedMissionId] = useState<string>(missionCollections.upgradeMissions[0]?.id || '');
-  const missionLookup = useMemo(() => {
-    const map: Record<string, Mission> = {};
-    missionCollections.upgradeMissions.forEach(mission => {
-      map[mission.id] = mission;
-    });
-    missionCollections.questMissions.forEach(mission => {
-      map[mission.id] = mission;
-    });
-    return map;
-  }, []);
 
-  const handlePlannerCategoryChange = (type: MissionType) => {
-    if (type === plannerCategory) return;
-    setPlannerCategory(type);
-    const list = type === 'upgrade' ? missionCollections.upgradeMissions : missionCollections.questMissions;
-    setSelectedMissionId(list[0]?.id || '');
+  // Roadmap handlers
+  const handleToggleMission = (missionId: string) => {
+    setCompletedMissions(prev =>
+      prev.includes(missionId)
+        ? prev.filter(id => id !== missionId)
+        : [...prev, missionId]
+    );
   };
 
   // Filtered loot
@@ -123,39 +109,17 @@ export default function Home() {
 
   const blueprintStats = useMemo(() => getCollectionStats(ownedBlueprints), [ownedBlueprints]);
   const recommendedBuild = useMemo(() => calculateRecommendedBuild(), []);
-  const missionPlan = useMemo(() => {
-    if (!selectedMissionId) return null;
-    return computeMissionPlan(selectedMissionId, workshopLevels, scrappyLevel);
-  }, [selectedMissionId, workshopLevels, scrappyLevel]);
-
-  const targetBenchLabel = missionPlan?.mission.target
-    ? getBenchDisplayName(missionPlan.mission.target.benchId)
-    : undefined;
-
-  const handleProgressionToggle = (taskKey: string, checked: boolean) => {
-    setProgressionState(prev => ({ ...prev, [taskKey]: checked }));
-  };
-
-  const handleProgressionPlannerFocus = (task: ProgressionTask) => {
-    const mission = missionLookup[task.targetId];
-    if (!mission) {
-      alert('No planner entry available for this task yet.');
-      return;
-    }
-    setPlannerCategory(mission.type);
-    setSelectedMissionId(mission.id);
-    setActiveTab('planner');
-  };
 
   // Export/Import handlers
   const handleExport = () => {
     const data: AppData = {
-      version: '1.0',
+      version: '1.1',
       exportDate: new Date().toISOString(),
       workshopLevels,
       scrappyLevel,
       ownedBlueprints,
-      playerLevel
+      playerLevel,
+      completedMissions
     };
     downloadData(data);
   };
@@ -171,6 +135,9 @@ export default function Home() {
         setScrappyLevel(data.scrappyLevel);
         setOwnedBlueprints(data.ownedBlueprints);
         setPlayerLevel(data.playerLevel);
+        if (data.completedMissions) {
+          setCompletedMissions(data.completedMissions);
+        }
         alert('Progress imported successfully!');
       } else {
         alert('Invalid file format');
@@ -186,12 +153,11 @@ export default function Home() {
   };
 
   const tabs = [
+    { id: 'roadmap' as Tab, label: 'Roadmap', icon: Route },
     { id: 'loot' as Tab, label: 'Loot Database', icon: Package },
     { id: 'workshop' as Tab, label: 'Workshop', icon: Wrench },
     { id: 'skills' as Tab, label: 'Skills', icon: Target },
-    { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen },
-    { id: 'progression' as Tab, label: 'Progression', icon: Flag },
-    { id: 'planner' as Tab, label: 'Planner', icon: MapPin }
+    { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen }
   ];
 
   return (
@@ -606,208 +572,12 @@ export default function Home() {
           </div>
         )}
 
-        {activeTab === 'progression' && (
-          <ProgressionTab
-            completionState={progressionState}
-            onToggleTask={handleProgressionToggle}
-            onNavigateToPlanner={handleProgressionPlannerFocus}
+        {/* ROADMAP TAB */}
+        {activeTab === 'roadmap' && (
+          <RoadmapTab
+            completedMissions={completedMissions}
+            onToggleMission={handleToggleMission}
           />
-        )}
-
-        {/* PLANNER TAB */}
-        {activeTab === 'planner' && (
-          <div className="space-y-6">
-            <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h2 className="text-lg font-bold text-yellow-500">Session Planner</h2>
-                  <p className="text-xs text-zinc-500">Pick a mission/upgrade to see the best solo farming route.</p>
-                  <div className="flex gap-2 mt-3">
-                    {(['upgrade', 'quest'] as MissionType[]).map(type => (
-                      <button
-                        key={type}
-                        onClick={() => handlePlannerCategoryChange(type)}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold border transition ${
-                          plannerCategory === type
-                            ? 'border-yellow-500 text-yellow-400 bg-yellow-500/10'
-                            : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'
-                        }`}
-                      >
-                        {type === 'upgrade' ? 'Upgrades' : 'Quests'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {plannerCategory === 'upgrade' ? (
-                  <select
-                    value={selectedMissionId}
-                    onChange={e => setSelectedMissionId(e.target.value)}
-                    className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
-                  >
-                    {missionCollections.upgradeGroups.map(group => (
-                      <optgroup key={group.id} label={group.label}>
-                        {group.missions.map(mission => (
-                          <option key={mission.id} value={mission.id}>
-                            {mission.title}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                ) : (
-                  <select
-                    value={selectedMissionId}
-                    onChange={e => setSelectedMissionId(e.target.value)}
-                    className="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-sm"
-                  >
-                    {missionCollections.questMissions.map(mission => (
-                      <option key={mission.id} value={mission.id}>
-                        {mission.title}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              {missionPlan && (
-                <div className="mt-4 border-t border-zinc-700 pt-4 space-y-2">
-                  <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
-                    <span className="text-white font-semibold">{missionPlan.mission.title}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${missionPlan.mission.type === 'upgrade' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'}`}>
-                      {missionPlan.mission.type === 'upgrade' ? 'Upgrade' : 'Quest'}
-                    </span>
-                    {missionPlan.mission.target && targetBenchLabel && (
-                      <span>
-                        Target: {targetBenchLabel} → L{missionPlan.mission.target.targetLevel}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-500">{missionPlan.mission.description}</p>
-                  {missionPlan.isComplete && (
-                    <p className="text-xs text-green-400 font-semibold">Already completed with your current workshop levels.</p>
-                  )}
-                  {missionPlan.mission.rewardNote && (
-                    <p className="text-xs text-amber-400">Reward: {missionPlan.mission.rewardNote}</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {missionPlan && !missionPlan.isComplete && (
-              <>
-                <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-                  <h3 className="text-md font-semibold text-white mb-3">Required Materials</h3>
-                  {missionPlan.requirements.length === 0 ? (
-                    <p className="text-sm text-zinc-500">No materials needed. Head out and complete the mission objective.</p>
-                  ) : (
-                    <>
-                      <div className="hidden md:block overflow-auto">
-                        <table className="w-full text-sm">
-                          <thead className="text-xs text-zinc-500">
-                            <tr>
-                              <th className="text-left py-2">Item</th>
-                              <th className="text-left py-2">Qty</th>
-                              <th className="text-left py-2">Tag</th>
-                              <th className="text-left py-2">Best Map / Hotspot</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {missionPlan.requirements.map(req => {
-                              const bestSpot = req.bestSpots[0];
-                              return (
-                                <tr key={req.itemName} className="border-t border-zinc-700">
-                                  <td className="py-2">
-                                    <p className="font-semibold text-white">{req.itemName}</p>
-                                    {req.note && <p className="text-xs text-zinc-500">{req.note}</p>}
-                                  </td>
-                                  <td className="py-2 text-zinc-400">x{req.quantity}</td>
-                                  <td className="py-2">
-                                    {req.locationTag && (
-                                      <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
-                                        {req.locationTag}
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td className="py-2 text-xs text-zinc-400">
-                                    {bestSpot ? (
-                                      <div>
-                                        <p className="text-white">{bestSpot.map} — {bestSpot.hotspot}</p>
-                                        <p className="text-zinc-500">{bestSpot.tip}</p>
-                                      </div>
-                                    ) : (
-                                      <span>Check loot database</span>
-                                    )}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="md:hidden space-y-3">
-                        {missionPlan.requirements.map(req => {
-                          const bestSpot = req.bestSpots[0];
-                          return (
-                            <div key={req.itemName} className="border border-zinc-700 rounded-lg p-3 bg-zinc-900/40 text-sm">
-                              <div className="flex items-center justify-between">
-                                <p className="font-semibold text-white">{req.itemName}</p>
-                                <span className="text-yellow-400 font-bold">x{req.quantity}</span>
-                              </div>
-                              {req.note && <p className="text-xs text-zinc-500 mt-1">{req.note}</p>}
-                              <div className="flex items-center gap-2 mt-2">
-                                {req.locationTag && (
-                                  <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[req.locationTag]}`}>
-                                    {req.locationTag}
-                                  </span>
-                                )}
-                                {req.itemData?.rarity && (
-                                  <span className="text-xs text-zinc-500">{req.itemData.rarity}</span>
-                                )}
-                              </div>
-                              <div className="mt-2 text-xs text-zinc-400">
-                                {bestSpot ? (
-                                  <div>
-                                    <p className="text-white">{bestSpot.map}</p>
-                                    <p>{bestSpot.hotspot}</p>
-                                    <p className="text-zinc-500">{bestSpot.tip}</p>
-                                  </div>
-                                ) : (
-                                  <p>Check loot database</p>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-                  <h3 className="text-md font-semibold text-white mb-3">Suggested Route</h3>
-                  {missionPlan.routes.length === 0 ? (
-                    <p className="text-sm text-zinc-500">No hotspots found. Use the Loot tab to locate alternatives.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {missionPlan.routes.map(route => (
-                        <div key={route.map} className="bg-zinc-900/40 border border-zinc-700 rounded-lg p-3">
-                          <p className="text-sm font-semibold text-yellow-400 mb-2">{route.map}</p>
-                          <div className="space-y-2">
-                            {route.hotspots.map(h => (
-                              <div key={h.hotspot} className="text-xs">
-                                <p className="text-white font-semibold">{h.hotspot}</p>
-                                <p className="text-zinc-500 mb-1">{h.tip}</p>
-                                <p className="text-emerald-400">Farm: {h.items.join(', ')}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
         )}
       </main>
       <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-zinc-950/95 border-t border-zinc-800 px-2 py-2 flex items-center justify-around z-30 backdrop-blur">

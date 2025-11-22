@@ -1,17 +1,16 @@
 # Arc Raiders Companion Tool
 
-A browser-based companion for **Arc Raiders** solo raiders. It gives you a living database for loot, workshops, skills, blueprints, and mission planning while keeping everything local via `localStorage` (with optional JSON backup/restore).
+A browser-based companion for **Arc Raiders** solo raiders. It gives you a living database for loot, workshops, skills, blueprints, and a step-by-step mission roadmap while keeping everything local via `localStorage` (with optional JSON backup/restore).
 
 ## Highlights
 
-- **Authoritative Loot Database** – Every entry now carries hand-authored `rarity`, `locationTag`, and `status` labels (`KEEP`, `SELL`, `RECYCLE`, `USE`). Filters respect these tags, including new `Topside` and `Crafting` hotspots for farmable vs. refiner-only materials.
+- **Solo Raider Roadmap** – A research-backed, 20-mission progression guide organized into 4 phases (The Rat → The Scavenger → The Operator → The Apex). Each mission shows expandable resource requirements with farming locations, explains WHY it matters, and tracks your completion. Click the caret to reveal materials, best maps/hotspots, and pro tips.
+- **Authoritative Loot Database** – Every entry carries hand-authored `rarity`, `locationTag`, and `status` labels (`KEEP`, `SELL`, `RECYCLE`, `USE`). Filters respect these tags, including `Topside` and `Crafting` hotspots for farmable vs. refiner-only materials.
 - **Live Alpha/Beta Data** – Skills, blueprints, quests, and loot flags are synced with the latest Arc Raiders playtest (e.g., the refreshed Mobility tree, S-tier Bettina/Renegade/Anvil rankings, 1x Fertilizer for Unexpected Initiative, and the Toaster → `RECYCLE` change).
-- **Crash-Resistant Local Storage** – Workshop levels, Scrappy progress, skills, and blueprints store via a client-only hook that now guards against hydration loops, so toggling levels or importing saves won’t spam console errors.
-- **Contextual Farming Routes** – Items inherit curated hotspots (ARC crash sites, Refiner station, etc.) so the planner can generate realistic solo-friendly routes per mission requirement.
-- **Planner (Upgrades + Quests)** – The Session Planner auto-generates every bench/Scrappy upgrade directly from `workshopDb`, groups them by workbench, and splits UI controls between Upgrades and Quests. It also ships with the default quest chain (Unexpected Initiative, Doctor’s Orders, Expedition Prep, Snap & Salvage, Tribute to Toledo, Armored Transports) so you can prep for story beats.
+- **Crash-Resistant Local Storage** – Workshop levels, Scrappy progress, skills, blueprints, and roadmap completion store via a client-only hook that guards against hydration loops.
+- **Contextual Farming Routes** – Items inherit curated hotspots (ARC crash sites, Refiner station, etc.) so the roadmap displays realistic solo-friendly farming locations per mission requirement.
 - **Workshop + Scrappy Tracker** – Track each bench level, required materials, unlocks, and a recommended solo-friendly upgrade order. Scrappy upgrades are included for planning passive income.
 - **Skill + Blueprint Tracking** – Collapsible skill trees with recommended point buckets, plus a blueprint catalog that filters by ownership, bench, and priority.
-- **Solo Raider Roadmap** – A dedicated Progression tab walks you through phased checklists (Rat → Scavenger → Operator → Apex) with per-task tips plus planner deep links, so you always know the next craft, quest, loot run, or upgrade.
 - **Phone-Friendly Layouts** – Mobile users get a sticky tab bar and card-based mission views so requirements, hotspots, and roadmap steps stay readable on small screens without affecting desktop.
 - **Progress Sync** – All player inputs persist in the browser and can be exported/imported as JSON to sync between devices.
 
@@ -24,11 +23,29 @@ npm run dev
 
 Then browse to [http://localhost:3000](http://localhost:3000).
 
-## Planner Details
+## Roadmap Details
 
-- All upgrade missions are generated from the canonical `workshopDb` + Scrappy definitions. When bench data changes, the planner automatically reflects the new material requirements/unlock notes.
-- The Session Planner UI now exposes two chips (Upgrades / Quests). Upgrade selection shows grouped `<optgroup>` lists for each bench (including Scrappy). Quest selection lists the default in-game quests.
-- Mission planning respects your saved workshop/scrappy levels; completed upgrades are marked as such, and required materials inherit loot metadata (rarity, color tags, route hints).
+The Roadmap tab is the heart of the companion app. It provides a clear, sequential mission guide based on community research and solo play optimization:
+
+**Phase 1: The Rat (Levels 1-5)**
+- Unlock trading, Scrappy, and mobility skills
+- Focus: Establish economy and passive income
+
+**Phase 2: The Scavenger (Levels 5-15)**
+- Gunsmith L2, Medical Lab, In-Round Crafting
+- Focus: Self-sustaining crafting and faster looting
+
+**Phase 3: The Operator (Levels 15-25)**
+- THE SURVIVABILITY SPIKE: Gear Bench L2 → Medium Shield
+- Refiner L2, Gunsmith L3 for meta weapons (Anvil)
+- Focus: Stop getting one-shot, become combat effective
+
+**Phase 4: The Apex (Levels 25+)**
+- Heavy Shield, Vita Spray, Security Breach skill
+- Max Scrappy for passive rare materials
+- Focus: Endgame optimization and dominance
+
+Each mission card expands to show required materials with quantities, best farming locations (map + hotspot), location tags, and pro tips for solo raiders.
 
 ## Loot & Data Model Notes
 
