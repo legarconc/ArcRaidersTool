@@ -2,6 +2,8 @@
 
 A browser-based companion for **Arc Raiders** solo raiders. It gives you a living database for loot, workshops, skills, blueprints, and a step-by-step mission roadmap while keeping everything local via `localStorage` (with optional JSON backup/restore).
 
+**Live App:** https://legarconc.github.io/ArcRaidersTool/
+
 ## Highlights
 
 - **Solo Raider Roadmap** – A research-backed, 20-mission progression guide organized into 4 phases (The Rat → The Scavenger → The Operator → The Apex). Each mission shows expandable resource requirements with farming locations, explains WHY it matters, and tracks your completion. Click the caret to reveal materials, best maps/hotspots, and pro tips.
@@ -66,3 +68,41 @@ Each mission card expands to show required materials with quantities, best farmi
 - [Tailwind CSS 4 beta](https://tailwindcss.com/)
 - [Lucide Icons](https://lucide.dev/)
 - [TypeScript 5](https://www.typescriptlang.org/)
+
+## Deployment
+
+This app is automatically deployed to **GitHub Pages** via GitHub Actions.
+
+### How it works
+
+1. **Static Export** - Next.js is configured for static export (`output: "export"` in `next.config.ts`)
+2. **GitHub Actions** - On every push to `main`, the workflow in `.github/workflows/deploy.yml`:
+   - Installs dependencies with `npm ci`
+   - Builds the static site to the `out/` directory
+   - Uploads and deploys to GitHub Pages
+3. **GitHub Pages** - Serves the static files at the live URL
+
+### Key configuration
+
+In `next.config.ts`:
+```typescript
+const nextConfig: NextConfig = {
+  output: "export",              // Enable static HTML export
+  basePath: "/ArcRaidersTool",   // Must match GitHub repo name (case-sensitive!)
+  assetPrefix: "/ArcRaidersTool",
+  images: { unoptimized: true }, // Required for static export
+};
+```
+
+The `public/.nojekyll` file prevents GitHub Pages from using Jekyll processing, which would otherwise ignore the `_next` folder containing CSS and JavaScript.
+
+### Forking this repo
+
+If you fork this repository:
+
+1. Go to **Settings → Pages** in your fork
+2. Set **Source** to "GitHub Actions"
+3. Update `basePath` and `assetPrefix` in `next.config.ts` to match your repo name
+4. Push to `main` - the workflow will build and deploy automatically
+
+Note: GitHub Pages CDN may cache old versions for a few minutes after deployment.
