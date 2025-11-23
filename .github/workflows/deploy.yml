@@ -33,6 +33,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Debug - Show next.config.ts
+        run: cat next.config.ts
+
+      - name: Debug - Check paths in index.html
+        run: grep -o 'href="[^"]*"' out/index.html | head -10
+
+      - name: Debug - List out directory
+        run: ls -la out/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
