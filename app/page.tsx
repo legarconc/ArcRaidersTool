@@ -2,15 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Wrench, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin, Route } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
-import { workbenches, scrappyUpgrades, upgradeOrder } from '@/lib/workshopDb';
-import { skillBranches, calculateRecommendedBuild } from '@/lib/skillsDb';
+import { skillBranches, soloStealthBuildOrder } from '@/lib/skillsDb';
 import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
 import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
-import { RoadmapTab } from '@/components/RoadmapTab';
 
-type Tab = 'loot' | 'workshop' | 'skills' | 'blueprints' | 'roadmap';
+type Tab = 'loot' | 'skills' | 'blueprints';
 
 const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
   KEEP: { border: 'border-green-500', text: 'text-green-500', bg: 'bg-green-500/20', icon: CheckCircle },
@@ -52,20 +50,14 @@ const priorityColors: Record<string, string> = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('roadmap');
+  const [activeTab, setActiveTab] = useState<Tab>('loot');
 
   // Loot tab state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<Item['status'] | 'ALL'>('ALL');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'ALL'>('ALL');
   const [locationFilter, setLocationFilter] = useState<LocationTag | 'ALL'>('ALL');
-
-  // Workshop tab state
-  const [workshopLevels, setWorkshopLevels] = useLocalStorage<Record<string, number>>('arc-workshop-levels', {
-    'gunsmith': 1, 'gear-bench': 1, 'medical-lab': 1, 'utility-station': 1, 'explosives-station': 1, 'refiner': 1
-  });
-  const [scrappyLevel, setScrappyLevel] = useLocalStorage<number>('arc-scrappy-level', 1);
-  const [completedMissions, setCompletedMissions] = useLocalStorage<string[]>('arc-roadmap-missions', []);
+  const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
 
   // Skills tab state
   const [playerLevel, setPlayerLevel] = useLocalStorage<number>('arc-player-level', 1);
@@ -76,16 +68,7 @@ export default function Home() {
   const [blueprintFilter, setBlueprintFilter] = useState<'all' | 'owned' | 'missing'>('all');
   const [workbenchFilter, setWorkbenchFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
-
-  // Roadmap handlers
-  const handleToggleMission = (missionId: string) => {
-    setCompletedMissions(prev =>
-      prev.includes(missionId)
-        ? prev.filter(id => id !== missionId)
-        : [...prev, missionId]
-    );
-  };
+  const [blueprintSearch, setBlueprintSearch] = useState('');
 
   // Filtered loot
   const filteredLoot = useMemo(() => {
@@ -100,26 +83,37 @@ export default function Home() {
   // Filtered blueprints
   const filteredBlueprints = useMemo(() => {
     let bps = blueprints;
+    if (blueprintSearch.trim()) {
+      const query = blueprintSearch.toLowerCase();
+      bps = bps.filter(bp =>
+        bp.name.toLowerCase().includes(query) ||
+        bp.description.toLowerCase().includes(query) ||
+        (bp.location && bp.location.toLowerCase().includes(query))
+      );
+    }
     if (blueprintFilter === 'owned') bps = bps.filter(bp => ownedBlueprints.includes(bp.id));
     if (blueprintFilter === 'missing') bps = bps.filter(bp => !ownedBlueprints.includes(bp.id));
     if (workbenchFilter !== 'all') bps = bps.filter(bp => bp.workbench === workbenchFilter);
     if (priorityFilter !== 'all') bps = bps.filter(bp => bp.priority === priorityFilter);
     return bps;
-  }, [blueprintFilter, workbenchFilter, priorityFilter, ownedBlueprints]);
+  }, [blueprintFilter, workbenchFilter, priorityFilter, ownedBlueprints, blueprintSearch]);
 
   const blueprintStats = useMemo(() => getCollectionStats(ownedBlueprints), [ownedBlueprints]);
-  const recommendedBuild = useMemo(() => calculateRecommendedBuild(), []);
+
+  // Calculate total recommended skill points
+  const totalRecommendedPoints = useMemo(() => {
+    return skillBranches.reduce((total, branch) =>
+      total + branch.skills.reduce((sum, skill) => sum + skill.recommendedPoints, 0), 0
+    );
+  }, []);
 
   // Export/Import handlers
   const handleExport = () => {
     const data: AppData = {
-      version: '1.1',
+      version: '2.0',
       exportDate: new Date().toISOString(),
-      workshopLevels,
-      scrappyLevel,
       ownedBlueprints,
-      playerLevel,
-      completedMissions
+      playerLevel
     };
     downloadData(data);
   };
@@ -131,13 +125,8 @@ export default function Home() {
     reader.onload = (event) => {
       const data = importData(event.target?.result as string);
       if (data) {
-        setWorkshopLevels(data.workshopLevels);
-        setScrappyLevel(data.scrappyLevel);
-        setOwnedBlueprints(data.ownedBlueprints);
-        setPlayerLevel(data.playerLevel);
-        if (data.completedMissions) {
-          setCompletedMissions(data.completedMissions);
-        }
+        if (data.ownedBlueprints) setOwnedBlueprints(data.ownedBlueprints);
+        if (data.playerLevel) setPlayerLevel(data.playerLevel);
         alert('Progress imported successfully!');
       } else {
         alert('Invalid file format');
@@ -153,9 +142,7 @@ export default function Home() {
   };
 
   const tabs = [
-    { id: 'roadmap' as Tab, label: 'Roadmap', icon: Route },
     { id: 'loot' as Tab, label: 'Loot Database', icon: Package },
-    { id: 'workshop' as Tab, label: 'Workshop', icon: Wrench },
     { id: 'skills' as Tab, label: 'Skills', icon: Target },
     { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen }
   ];
@@ -299,117 +286,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* WORKSHOP TAB */}
-        {activeTab === 'workshop' && (
-          <div className="space-y-6">
-            <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-              <h2 className="text-lg font-bold text-yellow-500 mb-3">Recommended Upgrade Order (Solo)</h2>
-              <div className="flex flex-wrap gap-2">
-                {upgradeOrder.slice(0, 6).map((step, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-zinc-700 rounded-lg px-3 py-2">
-                    <span className="w-6 h-6 flex items-center justify-center bg-yellow-500 text-black rounded-full text-sm font-bold">{i + 1}</span>
-                    <span className="text-sm">{step.id === 'scrappy' ? 'Scrappy' : workbenches.find(w => w.id === step.id)?.name} L{step.targetLevel}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Workbenches Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {workbenches.map(bench => {
-                const currentLevel = workshopLevels[bench.id] || 1;
-                const nextLevel = bench.levels.find(l => l.level === currentLevel + 1);
-                return (
-                  <div key={bench.id} className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-bold text-lg">{bench.name}</h3>
-                        <p className="text-xs text-zinc-500">{bench.description}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded ${priorityColors[bench.priority]}`}>{bench.priority}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm text-zinc-400">Level:</span>
-                      <div className="flex gap-1">
-                        {[1, 2, 3].map(lvl => (
-                          <button
-                            key={lvl}
-                            onClick={() => setWorkshopLevels(prev => ({ ...prev, [bench.id]: lvl }))}
-                            className={`w-8 h-8 rounded ${currentLevel >= lvl ? 'bg-yellow-500 text-black' : 'bg-zinc-700 text-zinc-400'} font-bold`}
-                          >
-                            {lvl}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {nextLevel && (
-                      <div className="border-t border-zinc-700 pt-3">
-                        <h4 className="text-sm font-medium text-yellow-500 mb-2">Level {nextLevel.level} Requirements:</h4>
-                        <ul className="space-y-1">
-                          {nextLevel.materials.map((mat, i) => (
-                            <li key={i} className="text-sm text-zinc-400 flex justify-between">
-                              <span>{mat.name}</span>
-                              <span className="text-zinc-500">x{mat.quantity}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <h4 className="text-sm font-medium text-green-500 mt-3 mb-1">Unlocks:</h4>
-                        <ul className="text-xs text-zinc-500 space-y-0.5">
-                          {nextLevel.unlocks.map((u, i) => <li key={i}>• {u}</li>)}
-                        </ul>
-                      </div>
-                    )}
-                    {currentLevel === 3 && <p className="text-green-500 text-sm font-medium mt-2">Fully Upgraded</p>}
-                  </div>
-                );
-              })}
-
-              {/* Scrappy */}
-              <div className="bg-zinc-800 rounded-lg p-4 border border-amber-500/50">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-bold text-lg text-amber-400">Scrappy (Rooster)</h3>
-                    <p className="text-xs text-zinc-500">Passive loot gathering</p>
-                  </div>
-                  <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400">High</span>
-                </div>
-
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-sm text-zinc-400">Level:</span>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(lvl => (
-                      <button
-                        key={lvl}
-                        onClick={() => setScrappyLevel(lvl)}
-                        className={`w-8 h-8 rounded ${scrappyLevel >= lvl ? 'bg-amber-500 text-black' : 'bg-zinc-700 text-zinc-400'} font-bold text-sm`}
-                      >
-                        {lvl}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {scrappyLevel < 5 && scrappyUpgrades[scrappyLevel - 1] && (
-                  <div className="border-t border-zinc-700 pt-3">
-                    <h4 className="text-sm font-medium text-amber-400 mb-2">Level {scrappyLevel + 1} Requirements:</h4>
-                    <ul className="space-y-1">
-                      {scrappyUpgrades[scrappyLevel - 1].materials.map((mat, i) => (
-                        <li key={i} className="text-sm text-zinc-400 flex justify-between">
-                          <span>{mat.name}</span>
-                          <span className="text-zinc-500">x{mat.quantity}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {scrappyLevel === 5 && <p className="text-amber-400 text-sm font-medium mt-2">Master Hoarder Unlocked</p>}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* SKILLS TAB */}
         {activeTab === 'skills' && (
           <div className="space-y-6">
@@ -433,61 +309,93 @@ export default function Home() {
                 </div>
                 <div className="text-sm">
                   <span className="text-zinc-400">Recommended Build: </span>
-                  <span className="text-green-500 font-bold">{recommendedBuild.total} points</span>
+                  <span className="text-green-500 font-bold">{totalRecommendedPoints} points</span>
                 </div>
               </div>
               <div className="w-full bg-zinc-700 rounded-full h-2">
                 <div
                   className="bg-yellow-500 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min(100, (playerLevel / recommendedBuild.total) * 100)}%` }}
+                  style={{ width: `${Math.min(100, (playerLevel / totalRecommendedPoints) * 100)}%` }}
                 />
               </div>
               <p className="text-xs text-zinc-500 mt-2">
-                {playerLevel >= recommendedBuild.total ? 'All recommended skills available!' : `Reach level ${recommendedBuild.total} for full build`}
+                {playerLevel >= totalRecommendedPoints ? 'All recommended skills available!' : `Reach level ${totalRecommendedPoints} for full build`}
               </p>
+            </div>
+
+            {/* Recommended Skill Progression */}
+            <div className="bg-zinc-800 rounded-lg p-4 border border-yellow-500/50">
+              <h2 className="text-lg font-bold text-yellow-500 mb-3">Recommended Skill Progression (Solo)</h2>
+              <p className="text-sm text-zinc-400 mb-4">Follow this order when spending skill points for optimal solo gameplay:</p>
+              <div className="space-y-2">
+                {soloStealthBuildOrder.map((step, i) => {
+                  const branch = skillBranches.find(b => b.skills.some(s => s.id === step.skillId));
+                  const skill = branch?.skills.find(s => s.id === step.skillId);
+                  const cumulativePoints = soloStealthBuildOrder.slice(0, i + 1).reduce((sum, s) => sum + s.points, 0);
+                  const isUnlocked = playerLevel >= cumulativePoints;
+                  return (
+                    <div key={step.skillId} className={`flex items-center gap-3 p-3 rounded-lg ${isUnlocked ? 'bg-green-500/10 border border-green-500/30' : 'bg-zinc-700/50'}`}>
+                      <span className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold ${isUnlocked ? 'bg-green-500 text-black' : 'bg-zinc-600 text-zinc-400'}`}>{i + 1}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${isUnlocked ? 'text-green-400' : 'text-white'}`}>{skill?.name}</span>
+                          <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">{step.points} pts</span>
+                          <span className="text-xs text-zinc-500">({branch?.name})</span>
+                        </div>
+                        <p className="text-xs text-zinc-400 mt-0.5">{step.reason}</p>
+                      </div>
+                      <span className="text-xs text-zinc-500">Lvl {cumulativePoints}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Skill Branches */}
             <div className="space-y-4">
-              {skillBranches.map(branch => (
-                <div key={branch.id} className="bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden">
-                  <button
-                    onClick={() => setExpandedBranch(expandedBranch === branch.id ? null : branch.id)}
-                    className="w-full flex items-center justify-between p-4 hover:bg-zinc-700/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className={`w-3 h-3 rounded-full bg-${branch.color}-500`} />
-                      <h3 className="font-bold text-lg">{branch.name}</h3>
-                      <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">Priority #{branch.priority}</span>
-                    </div>
-                    {expandedBranch === branch.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </button>
+              {skillBranches.map(branch => {
+                const branchPoints = branch.skills.reduce((sum, s) => sum + s.recommendedPoints, 0);
+                return (
+                  <div key={branch.id} className="bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden">
+                    <button
+                      onClick={() => setExpandedBranch(expandedBranch === branch.id ? null : branch.id)}
+                      className="w-full flex items-center justify-between p-4 hover:bg-zinc-700/50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-3 h-3 rounded-full bg-${branch.color}-500`} />
+                        <h3 className="font-bold text-lg">{branch.name}</h3>
+                        <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">Priority #{branch.priority}</span>
+                        <span className="text-xs px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400">{branchPoints} pts recommended</span>
+                      </div>
+                      {expandedBranch === branch.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
 
-                  {expandedBranch === branch.id && (
-                    <div className="px-4 pb-4 space-y-2">
-                      <p className="text-sm text-zinc-500 mb-3">{branch.description}</p>
-                      {branch.skills.map(skill => (
-                        <div key={skill.id} className="flex items-start gap-3 p-3 bg-zinc-700/50 rounded-lg">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="font-medium">{skill.name}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[skill.priority]}`}>{skill.priority}</span>
-                              {skill.prerequisitePoints && (
-                                <span className="text-xs text-zinc-500">Requires {skill.prerequisitePoints} pts</span>
-                              )}
+                    {expandedBranch === branch.id && (
+                      <div className="px-4 pb-4 space-y-2">
+                        <p className="text-sm text-zinc-500 mb-3">{branch.description}</p>
+                        {branch.skills.map(skill => (
+                          <div key={skill.id} className="flex items-start gap-3 p-3 bg-zinc-700/50 rounded-lg">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="font-medium">{skill.name}</span>
+                                <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[skill.priority]}`}>{skill.priority}</span>
+                                {skill.prerequisitePoints && (
+                                  <span className="text-xs text-zinc-500">Requires {skill.prerequisitePoints} pts in tree</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-zinc-400">{skill.description}</p>
+                              <p className="text-xs text-green-400 mt-1">{skill.benefit}</p>
                             </div>
-                            <p className="text-sm text-zinc-400">{skill.description}</p>
-                            <p className="text-xs text-green-400 mt-1">{skill.benefit}</p>
+                            <div className="text-right">
+                              <span className="text-yellow-500 font-bold">{skill.recommendedPoints}/{skill.maxPoints}</span>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <span className="text-yellow-500 font-bold">{skill.recommendedPoints}/{skill.maxPoints}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -518,7 +426,17 @@ export default function Home() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="lg:col-span-2 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search blueprints..."
+                  value={blueprintSearch}
+                  onChange={(e) => setBlueprintSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
               <select value={blueprintFilter} onChange={e => setBlueprintFilter(e.target.value as typeof blueprintFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
                 <option value="all">All Blueprints</option>
                 <option value="owned">Owned</option>
@@ -542,6 +460,8 @@ export default function Home() {
               </select>
             </div>
 
+            <p className="text-zinc-500">{filteredBlueprints.length} blueprints found</p>
+
             {/* Blueprint Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredBlueprints.map(bp => {
@@ -563,21 +483,20 @@ export default function Home() {
                       <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[bp.priority]}`}>{bp.priority}</span>
                       <span className={`text-xs px-2 py-0.5 rounded ${rarityColors[bp.rarity]} bg-zinc-700`}>{bp.rarity}</span>
                     </div>
-                    <p className="text-xs text-zinc-500">L{bp.requiredLevel} {bp.workbench.replace(/-/g, ' ')}</p>
+                    <p className="text-xs text-zinc-500 mb-1">L{bp.requiredLevel} {bp.workbench.replace(/-/g, ' ')}</p>
+                    <p className="text-sm text-zinc-400">{bp.description}</p>
+                    {bp.location && (
+                      <div className="mt-2 flex items-start gap-1">
+                        <MapPin size={12} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-amber-400">{bp.location}</p>
+                      </div>
+                    )}
                     {bp.soloNote && <p className="text-xs text-yellow-500/80 mt-1">{bp.soloNote}</p>}
                   </div>
                 );
               })}
             </div>
           </div>
-        )}
-
-        {/* ROADMAP TAB */}
-        {activeTab === 'roadmap' && (
-          <RoadmapTab
-            completedMissions={completedMissions}
-            onToggleMission={handleToggleMission}
-          />
         )}
       </main>
       <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-zinc-950/95 border-t border-zinc-800 px-2 py-2 flex items-center justify-around z-30 backdrop-blur">

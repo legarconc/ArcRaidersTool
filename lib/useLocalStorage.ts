@@ -64,11 +64,8 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 export interface AppData {
   version: string;
   exportDate: string;
-  workshopLevels: Record<string, number>;
-  scrappyLevel: number;
   ownedBlueprints: string[];
   playerLevel: number;
-  completedMissions?: string[]; // Optional for backwards compatibility
 }
 
 export function exportData(data: AppData): string {
@@ -78,7 +75,7 @@ export function exportData(data: AppData): string {
 export function importData(jsonString: string): AppData | null {
   try {
     const data = JSON.parse(jsonString);
-    if (data.version && data.workshopLevels && data.ownedBlueprints !== undefined) {
+    if (data.version && data.ownedBlueprints !== undefined) {
       return data as AppData;
     }
     return null;

@@ -1,20 +1,54 @@
 # Arc Raiders Companion Tool
 
-A browser-based companion for **Arc Raiders** solo raiders. It gives you a living database for loot, workshops, skills, blueprints, and a step-by-step mission roadmap while keeping everything local via `localStorage` (with optional JSON backup/restore).
+A browser-based companion for **Arc Raiders** solo players. Features a comprehensive loot database, skill progression guide, and blueprint catalog with locations — all stored locally via `localStorage` with optional JSON backup/restore.
 
 **Live App:** https://legarconc.github.io/ArcRaidersTool/
 
-## Highlights
+*Last updated: December 2025*
 
-- **Solo Raider Roadmap** – A research-backed, 20-mission progression guide organized into 4 phases (The Rat → The Scavenger → The Operator → The Apex). Each mission shows expandable resource requirements with farming locations, explains WHY it matters, and tracks your completion. Click the caret to reveal materials, best maps/hotspots, and pro tips.
-- **Authoritative Loot Database** – Every entry carries hand-authored `rarity`, `locationTag`, and `status` labels (`KEEP`, `SELL`, `RECYCLE`, `USE`). Filters respect these tags, including `Topside` and `Crafting` hotspots for farmable vs. refiner-only materials.
-- **Live Alpha/Beta Data** – Skills, blueprints, quests, and loot flags are synced with the latest Arc Raiders playtest (e.g., the refreshed Mobility tree, S-tier Bettina/Renegade/Anvil rankings, 1x Fertilizer for Unexpected Initiative, and the Toaster → `RECYCLE` change).
-- **Crash-Resistant Local Storage** – Workshop levels, Scrappy progress, skills, blueprints, and roadmap completion store via a client-only hook that guards against hydration loops.
-- **Contextual Farming Routes** – Items inherit curated hotspots (ARC crash sites, Refiner station, etc.) so the roadmap displays realistic solo-friendly farming locations per mission requirement.
-- **Workshop + Scrappy Tracker** – Track each bench level, required materials, unlocks, and a recommended solo-friendly upgrade order. Scrappy upgrades are included for planning passive income.
-- **Skill + Blueprint Tracking** – Collapsible skill trees with recommended point buckets, plus a blueprint catalog that filters by ownership, bench, and priority.
-- **Phone-Friendly Layouts** – Mobile users get a sticky tab bar and card-based mission views so requirements, hotspots, and roadmap steps stay readable on small screens without affecting desktop.
-- **Progress Sync** – All player inputs persist in the browser and can be exported/imported as JSON to sync between devices.
+## Features
+
+### Loot Database (212+ items)
+- Every item tagged with **KEEP**, **SELL**, **RECYCLE**, or **USE** status
+- Clear reasoning for each recommendation (quest requirements, workshop upgrades, crafting materials)
+- Location tags: ARC, Industrial, Residential, Commercial, Nature, Medical, Military, Topside, Crafting
+- Expandable map-specific farming hotspots with tips
+- Filter by status, rarity, location type, and search
+
+### Skills Guide (3 trees, 75 points)
+- **Mobility** (Priority #1) — Stamina management, movement speed, parkour
+- **Survival** (Priority #2) — Looting, crafting, carry capacity
+- **Conditioning** (Priority #3) — Weight management, recovery, noise reduction
+
+**Key features:**
+- Recommended Skill Progression — Step-by-step order for solo players showing which skills to unlock first
+- Player level input shows which skills you can afford
+- Priority ratings (Critical, High, Medium, Optional) for each skill
+- Prerequisite requirements for major skills
+
+**Top priority skills:**
+- Marathon Runner & Youthful Lungs (stamina foundation)
+- In-Round Crafting (self-sufficiency during raids)
+- Used to the Weight (run heavy shields without penalty)
+- Security Breach (access security lockers for best blueprint drops)
+
+### Blueprints Catalog (53 blueprints)
+- All blueprints with **drop locations** and farming tips
+- Categories: Weapons, Attachments, Shields, Augments, Consumables, Tools, Explosives, Components
+- Priority ratings: Essential, High Value, Situational, Low Priority
+- Track owned blueprints with completion stats
+- Search and filter by workbench, priority, ownership
+
+**Notable blueprints with guaranteed sources:**
+- Hullcracker — Quest: The Major's Footlocker (Tian Wen)
+- Burletta — Quest: Industrial Espionage (Tian Wen)
+- Lure Grenade — Quest: Greasing Her Palms (Celeste)
+- Equalizer/Jupiter — Harvester Events
+
+### Progress Tracking
+- All data persists in browser localStorage
+- Export/Import JSON for cross-device sync
+- Track blueprint collection, player level
 
 ## Getting Started
 
@@ -23,86 +57,50 @@ npm install
 npm run dev
 ```
 
-Then browse to [http://localhost:3000](http://localhost:3000).
+Browse to [http://localhost:3000](http://localhost:3000).
 
-## Roadmap Details
+## Data Sources
 
-The Roadmap tab is the heart of the companion app. It provides a clear, sequential mission guide based on community research and solo play optimization:
-
-**Phase 1: The Rat (Levels 1-5)**
-- Unlock trading, Scrappy, and mobility skills
-- Focus: Establish economy and passive income
-
-**Phase 2: The Scavenger (Levels 5-15)**
-- Gunsmith L2, Medical Lab, In-Round Crafting
-- Focus: Self-sustaining crafting and faster looting
-
-**Phase 3: The Operator (Levels 15-25)**
-- THE SURVIVABILITY SPIKE: Gear Bench L2 → Medium Shield
-- Refiner L2, Gunsmith L3 for meta weapons (Anvil)
-- Focus: Stop getting one-shot, become combat effective
-
-**Phase 4: The Apex (Levels 25+)**
-- Heavy Shield, Vita Spray, Security Breach skill
-- Max Scrappy for passive rare materials
-- Focus: Endgame optimization and dominance
-
-Each mission card expands to show required materials with quantities, best farming locations (map + hotspot), location tags, and pro tips for solo raiders.
-
-## Loot & Data Model Notes
-
-- Loot metadata lives in `lib/lootDb.ts`. Each `Item` defines name, reason, raw location text, and explicit `rarity`/`locationTag` metadata. Any missing metadata throws during import, which keeps the dataset honest.
-- Location tags include ARC, Industrial, Residential, Commercial, Nature, Medical, Military, Topside, Crafting, and fallback Various. `Topside` surfaces low-pressure surface runs; `Crafting` highlights Refiner-only conversions.
-- Consumables or craft inputs that should be used (not sold) are tagged `USE`, which shows up as amber “Use/Consume” pills in the UI.
-
-## Development
-
-- **Lint:** `npm run lint`
-- **Type Safety:** `tsconfig.json` + strict hooks like `useSyncExternalStore` enforce client-only state hydration.
-- **Testing:** Run the dev server locally (`npm run dev`) to interact with localStorage, filters, planner flows, and mission routes.
+Item and blueprint data sourced from:
+- [ARC Raiders Wiki](https://arcraiders.wiki/)
+- [Arc Raiders Cheat Sheet](https://arcraiderscheatsheet.org/)
+- [GAM3S.GG Guides](https://gam3s.gg/arc-raiders/)
+- Community research and playtesting
 
 ## Tech Stack
 
-- [Next.js](https://nextjs.org/)
+- [Next.js 16](https://nextjs.org/)
 - [React 19](https://react.dev/)
-- [Tailwind CSS 4 beta](https://tailwindcss.com/)
+- [Tailwind CSS 4](https://tailwindcss.com/)
 - [Lucide Icons](https://lucide.dev/)
 - [TypeScript 5](https://www.typescriptlang.org/)
 
+## Development
+
+```bash
+npm run dev     # Development server
+npm run build   # Production build
+npm run lint    # Linting
+```
+
 ## Deployment
 
-This app is automatically deployed to **GitHub Pages** via GitHub Actions.
+Automatically deployed to **GitHub Pages** via GitHub Actions on push to `main`.
 
-### How it works
-
-1. **Static Export** - Next.js is configured for static export (`output: "export"` in `next.config.ts`)
-2. **GitHub Actions** - On every push to `main`, the workflow in `.github/workflows/deploy.yml`:
-   - Installs dependencies with `npm ci`
-   - Builds the static site to the `out/` directory
-   - Uploads and deploys to GitHub Pages
-3. **GitHub Pages** - Serves the static files at the live URL
-
-### Key configuration
+### Configuration
 
 In `next.config.ts`:
 ```typescript
 const nextConfig: NextConfig = {
-  output: "export",              // Enable static HTML export
-  basePath: "/ArcRaidersTool",   // Must match GitHub repo name (case-sensitive!)
+  output: "export",
+  basePath: "/ArcRaidersTool",
   assetPrefix: "/ArcRaidersTool",
-  images: { unoptimized: true }, // Required for static export
+  images: { unoptimized: true },
 };
 ```
 
-The `public/.nojekyll` file prevents GitHub Pages from using Jekyll processing, which would otherwise ignore the `_next` folder containing CSS and JavaScript.
+### Forking
 
-### Forking this repo
-
-If you fork this repository:
-
-1. Go to **Settings → Pages** in your fork
-2. Set **Source** to "GitHub Actions"
-3. Update `basePath` and `assetPrefix` in `next.config.ts` to match your repo name
-4. Push to `main` - the workflow will build and deploy automatically
-
-Note: GitHub Pages CDN may cache old versions for a few minutes after deployment.
+1. Go to **Settings → Pages** and set Source to "GitHub Actions"
+2. Update `basePath` and `assetPrefix` to match your repo name
+3. Push to `main` — deploys automatically
