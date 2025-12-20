@@ -35,9 +35,33 @@ export const blueprints: Blueprint[] = [
     type: 'Weapon',
     rarity: 'Epic',
     priority: 'Essential',
-    description: 'Top-tier Assault Rifle with excellent damage and accuracy.',
-    location: 'Security Lockers, High-Value Containers, Night Raids',
-    soloNote: 'S-Tier. Expensive to run, but shreds everything.'
+    description: 'Top-tier Assault Rifle. Buffed in 1.7.0 (Mag 22, Faster Reload).',
+    location: 'Dynamic Security Lockers, High-Value Containers, Night Raids',
+    soloNote: 'S-Tier. Expensive to run, but shreds everything. Now even better sustained fire.'
+  },
+  {
+    id: 'rattler',
+    name: 'Rattler AR',
+    workbench: 'gunsmith',
+    requiredLevel: 1,
+    type: 'Weapon',
+    rarity: 'Common',
+    priority: 'Essential',
+    description: 'Fully automatic assault rifle. Good starter weapon.',
+    location: 'Common containers, early quests',
+    soloNote: 'B-Tier. Reliable starter, buffed PvP TTK in 1.7.0.'
+  },
+  {
+    id: 'renegade',
+    name: 'Renegade',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Weapon',
+    rarity: 'Rare',
+    priority: 'High Value',
+    description: 'Lever-action battle rifle. High accuracy and headshot damage.',
+    location: 'Security Lockers, Weapon Cases',
+    soloNote: 'A-Tier. Versatile and fast when upgraded.'
   },
   {
     id: 'tempest',
@@ -125,15 +149,15 @@ export const blueprints: Blueprint[] = [
   },
   {
     id: 'aphelion',
-    name: 'Aphelion SMG',
+    name: 'Aphelion',
     workbench: 'gunsmith',
-    requiredLevel: 2,
+    requiredLevel: 3,
     type: 'Weapon',
-    rarity: 'Rare',
+    rarity: 'Legendary',
     priority: 'High Value',
-    description: 'Compact SMG with integrated suppressor.',
-    location: 'Security Lockers, Stealth-focused POIs',
-    soloNote: 'A-Tier. Excellent for stealth runs.'
+    description: 'Legendary Battle Rifle. Fires two-round bursts of high-velocity energy rounds.',
+    location: 'Stella Montis (Moved in 1.7.0)',
+    soloNote: 'S-Tier. Strong against ARC armor plating.'
   },
   {
     id: 'il-toro',

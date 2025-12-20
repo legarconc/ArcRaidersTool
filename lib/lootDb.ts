@@ -69,7 +69,7 @@ const mapLocationGuides: Record<LocationTag, MapLocation[]> = {
     { map: 'Dam & Highlands', hotspot: 'Rescue outpost', tip: 'A small POI north of the dam packed with bioscanners.' }
   ],
   Military: [
-    { map: 'Blue Gate', hotspot: 'Command bunker', tip: 'Security lockers for Bastion Cells and ARC Motion Cores.' },
+    { map: 'Blue Gate', hotspot: 'Command bunker', tip: 'Dynamic Security Lockers for Bastion Cells and ARC Motion Cores.' },
     { map: 'Buried City', hotspot: 'Checkpoint Sigma', tip: 'Sentinel convoys for firing cores and cores.' },
     { map: 'Dam & Highlands', hotspot: 'AA battery hill', tip: 'Spotter and Bombardier patrols constantly rotate through.' }
   ],
@@ -138,7 +138,7 @@ const rawLootDb: BaseItem[] = [
   { name: 'Tick Pod', status: 'KEEP', reason: 'Medical Lab II upgrade', location: 'Tick enemies' },
   { name: 'Fireball Burner', status: 'KEEP', reason: 'Quest item, Refiner II', location: 'Fireball enemies' },
   { name: 'Pop Trigger', status: 'KEEP', reason: 'Explosives Station II upgrade', location: 'Pop enemies' },
-  { name: 'Queen Reactor', status: 'KEEP', reason: 'Rare boss drop, very valuable', location: 'Queen boss' },
+  { name: 'Queen Reactor', status: 'KEEP', reason: 'Rare boss drop, sells for 34,000₡', location: 'Queen boss' },
   { name: 'Matriarch Reactor', status: 'KEEP', reason: 'Rare boss drop', location: 'Matriarch boss' },
   { name: 'Power Rod', status: 'KEEP', reason: 'Quest item (Tribute to Toledo)', location: 'Rare ARC drops' },
   { name: 'Shredder Gyro', status: 'KEEP', reason: 'Stella Montis upgrade material', location: 'Shredder enemies' },
@@ -254,6 +254,7 @@ const rawLootDb: BaseItem[] = [
   { name: 'Magnetron', status: 'KEEP', reason: 'Quest item (Snap and Salvage)', location: 'Quest-specific' },
   { name: 'Ion Sputter', status: 'KEEP', reason: 'Expedition Project material', location: 'Rare containers' },
   { name: 'Geiger Counter', status: 'KEEP', reason: 'Expedition Project material', location: 'Industrial POIs' },
+  { name: 'Candleberry', status: 'KEEP', reason: 'Quest item (Candleberry Banquet Project)', location: 'Various maps (Cold Snap)' },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // KEEP - KEYS (Always Keep - Open Rare Loot Rooms)
@@ -301,6 +302,7 @@ const rawLootDb: BaseItem[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   { name: 'Fine Wristwatch', status: 'SELL', reason: 'Rare trinket, sells for 3,000₡', location: 'Various containers' },
   { name: 'Music Album', status: 'SELL', reason: 'Rare trinket, sells for 3,000₡', location: 'Houses, stores' },
+  { name: 'Guitar', status: 'SELL', reason: 'Rare trinket, can play music', location: 'Houses, Cold Snap areas' },
   { name: 'Silver Teaspoon Set', status: 'SELL', reason: 'Rare trinket, sells for 3,000₡', location: 'Houses' },
   { name: 'Statuette', status: 'SELL', reason: 'Rare trinket, sells for 3,000₡', location: 'Various containers' },
   { name: 'Vase', status: 'SELL', reason: 'Common trinket, sells for 3,000₡', location: 'Houses' },
@@ -640,6 +642,8 @@ const lootMetadata: Record<string, { rarity: Rarity; locationTag: LocationTag }>
   'Tattered Clothes': { rarity: 'Common', locationTag: 'Residential' },
   'Torn Blanket': { rarity: 'Common', locationTag: 'Residential' },
   'Unusable Weapon': { rarity: 'Common', locationTag: 'Various' },
+  'Candleberry': { rarity: 'Common', locationTag: 'Nature' },
+  'Guitar': { rarity: 'Rare', locationTag: 'Residential' },
 } as const;
 
 export const lootDb: Item[] = rawLootDb.map(item => {

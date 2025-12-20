@@ -4,7 +4,7 @@ A browser-based companion for **Arc Raiders** solo players. Features a comprehen
 
 **Live App:** https://legarconc.github.io/ArcRaidersTool/
 
-*Last updated: December 2025*
+*Last updated: December 20, 2025 (v1.7.0 "Cold Snap" Update)*
 
 ## Features
 
@@ -26,7 +26,7 @@ A browser-based companion for **Arc Raiders** solo players. Features a comprehen
 - Priority ratings (Critical, High, Medium, Optional) for each skill
 - Prerequisite requirements for every major unlock
 
-### Blueprints Catalog (53 blueprints)
+### Blueprints Catalog (55+ blueprints)
 - All blueprints with **drop locations** and farming tips
 - Categories: Weapons, Attachments, Shields, Augments, Consumables, Tools, Explosives, Components
 - Priority ratings: Essential, High Value, Situational, Low Priority
