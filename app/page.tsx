@@ -2,11 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, Download, Upload, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { skillBranches, soloStealthBuildOrder } from '@/lib/skillsDb';
-import { blueprints, getCollectionStats } from '@/lib/blueprintsDb';
-import { useLocalStorage, AppData, downloadData, importData } from '@/lib/useLocalStorage';
+import { blueprints } from '@/lib/blueprintsDb';
 
 type Tab = 'loot' | 'skills' | 'blueprints';
 
@@ -62,14 +61,9 @@ export default function Home() {
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
 
   // Skills tab state
-  const [playerLevel, setPlayerLevel] = useLocalStorage<number>('arc-player-level', 1);
   const [expandedBranch, setExpandedBranch] = useState<string | null>('mobility');
 
   // Blueprints tab state
-  const [ownedBlueprints, setOwnedBlueprints] = useLocalStorage<string[]>('arc-blueprints', []);
-  const [blueprintFilter, setBlueprintFilter] = useState<'all' | 'owned' | 'missing'>('all');
-  const [workbenchFilter, setWorkbenchFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [blueprintSearch, setBlueprintSearch] = useState('');
 
   // Filtered loot
@@ -84,23 +78,15 @@ export default function Home() {
 
   // Filtered blueprints
   const filteredBlueprints = useMemo(() => {
-    let bps = blueprints;
-    if (blueprintSearch.trim()) {
-      const query = blueprintSearch.toLowerCase();
-      bps = bps.filter(bp =>
-        bp.name.toLowerCase().includes(query) ||
-        bp.description.toLowerCase().includes(query) ||
-        (bp.location && bp.location.toLowerCase().includes(query))
-      );
-    }
-    if (blueprintFilter === 'owned') bps = bps.filter(bp => ownedBlueprints.includes(bp.id));
-    if (blueprintFilter === 'missing') bps = bps.filter(bp => !ownedBlueprints.includes(bp.id));
-    if (workbenchFilter !== 'all') bps = bps.filter(bp => bp.workbench === workbenchFilter);
-    if (priorityFilter !== 'all') bps = bps.filter(bp => bp.priority === priorityFilter);
-    return bps;
-  }, [blueprintFilter, workbenchFilter, priorityFilter, ownedBlueprints, blueprintSearch]);
+    if (!blueprintSearch.trim()) return blueprints;
+    const query = blueprintSearch.toLowerCase();
+    return blueprints.filter(bp =>
+      bp.name.toLowerCase().includes(query) ||
+      bp.description.toLowerCase().includes(query) ||
+      (bp.location && bp.location.toLowerCase().includes(query))
+    );
+  }, [blueprintSearch]);
 
-  const blueprintStats = useMemo(() => getCollectionStats(ownedBlueprints), [ownedBlueprints]);
 
   // Calculate total recommended skill points
   const totalRecommendedPoints = useMemo(() => {
@@ -109,39 +95,19 @@ export default function Home() {
     );
   }, []);
 
-  // Export/Import handlers
-  const handleExport = () => {
-    const data: AppData = {
-      version: '2.0',
-      exportDate: new Date().toISOString(),
-      ownedBlueprints,
-      playerLevel
-    };
-    downloadData(data);
-  };
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = importData(event.target?.result as string);
-      if (data) {
-        if (data.ownedBlueprints) setOwnedBlueprints(data.ownedBlueprints);
-        if (data.playerLevel) setPlayerLevel(data.playerLevel);
-        alert('Progress imported successfully!');
-      } else {
-        alert('Invalid file format');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const toggleBlueprint = (id: string) => {
-    setOwnedBlueprints(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  const skippableSkills = useMemo(() => {
+    return skillBranches.flatMap(branch =>
+      branch.skills
+        .filter(skill => skill.recommendedPoints === 0)
+        .map(skill => ({
+          id: skill.id,
+          name: skill.name,
+          description: skill.description,
+          branch: branch.name
+        }))
     );
-  };
+  }, []);
+
 
   const tabs = [
     { id: 'loot' as Tab, label: 'Loot Database', icon: Package },
@@ -158,15 +124,6 @@ export default function Home() {
             <div>
               <h1 className="text-xl font-bold text-yellow-500">ARC Raiders Companion</h1>
               <p className="text-xs text-zinc-400 uppercase tracking-wide">Last update: {LAST_UPDATE}</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={handleExport} className="flex items-center gap-1 px-3 py-1 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg">
-                <Download size={14} /> Export
-              </button>
-              <label className="flex items-center gap-1 px-3 py-1 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg cursor-pointer">
-                <Upload size={14} /> Import
-                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-              </label>
             </div>
           </div>
           {/* Tabs */}
@@ -294,67 +251,54 @@ export default function Home() {
         {/* SKILLS TAB */}
         {activeTab === 'skills' && (
           <div className="space-y-6">
-            {/* Point Calculator */}
-            <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-zinc-400">Player Level:</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="75"
-                    value={playerLevel}
-                    onChange={e => setPlayerLevel(Math.min(75, Math.max(1, parseInt(e.target.value) || 1)))}
-                    className="w-20 px-3 py-1 bg-zinc-700 border border-zinc-600 rounded text-center"
-                  />
-                </div>
-                <div className="text-sm">
-                  <span className="text-zinc-400">Available Points: </span>
-                  <span className="text-yellow-500 font-bold">{playerLevel}</span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-zinc-400">Recommended Build: </span>
-                  <span className="text-green-500 font-bold">{totalRecommendedPoints} points</span>
-                </div>
-              </div>
-              <div className="w-full bg-zinc-700 rounded-full h-2">
-                <div
-                  className="bg-yellow-500 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min(100, (playerLevel / totalRecommendedPoints) * 100)}%` }}
-                />
-              </div>
-              <p className="text-xs text-zinc-500 mt-2">
-                {playerLevel >= totalRecommendedPoints ? 'All recommended skills available!' : `Reach level ${totalRecommendedPoints} for full build`}
-              </p>
-            </div>
-
-            {/* Recommended Skill Progression */}
             <div className="bg-zinc-800 rounded-lg p-4 border border-yellow-500/50">
-              <h2 className="text-lg font-bold text-yellow-500 mb-3">Recommended Skill Progression (Solo)</h2>
-              <p className="text-sm text-zinc-400 mb-4">Follow this order when spending skill points for optimal solo gameplay:</p>
+              <h2 className="text-lg font-bold text-yellow-500 mb-2">Recommended Skill Progression</h2>
+              <p className="text-sm text-zinc-400 mb-4">
+                Follow this order when spending the {totalRecommendedPoints} recommended points. It covers every critical mobility,
+                survival, and combat perk for late-game raids.
+              </p>
               <div className="space-y-2">
                 {soloStealthBuildOrder.map((step, i) => {
                   const branch = skillBranches.find(b => b.skills.some(s => s.id === step.skillId));
                   const skill = branch?.skills.find(s => s.id === step.skillId);
                   const cumulativePoints = soloStealthBuildOrder.slice(0, i + 1).reduce((sum, s) => sum + s.points, 0);
-                  const isUnlocked = playerLevel >= cumulativePoints;
                   return (
-                    <div key={step.skillId} className={`flex items-center gap-3 p-3 rounded-lg ${isUnlocked ? 'bg-green-500/10 border border-green-500/30' : 'bg-zinc-700/50'}`}>
-                      <span className={`w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold ${isUnlocked ? 'bg-green-500 text-black' : 'bg-zinc-600 text-zinc-400'}`}>{i + 1}</span>
+                    <div key={step.skillId} className="flex items-start gap-3 p-3 rounded-lg border border-zinc-700 bg-zinc-900/40">
+                      <span className="w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold bg-yellow-500 text-black">
+                        {i + 1}
+                      </span>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-medium ${isUnlocked ? 'text-green-400' : 'text-white'}`}>{skill?.name}</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">{step.points} pts</span>
-                          <span className="text-xs text-zinc-500">({branch?.name})</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium text-white">{skill?.name}</span>
+                          <span className="text-xs px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{step.points} pts</span>
+                          <span className="text-xs text-zinc-500">{branch?.name}</span>
+                          <span className="text-xs text-yellow-400 font-semibold">Total {cumulativePoints} pts</span>
                         </div>
                         <p className="text-xs text-zinc-400 mt-0.5">{step.reason}</p>
                       </div>
-                      <span className="text-xs text-zinc-500">Lvl {cumulativePoints}</span>
                     </div>
                   );
                 })}
               </div>
             </div>
+
+            {skippableSkills.length > 0 && (
+              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                <h3 className="text-lg font-bold text-white mb-2">Skills You Can Skip</h3>
+                <p className="text-sm text-zinc-400 mb-4">
+                  These unlocks have a negligible payoff—avoid investing points here until the rest of your kit is finished.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {skippableSkills.map(skill => (
+                    <div key={skill.id} className="p-3 rounded-lg border border-zinc-700 bg-zinc-900/40">
+                      <p className="font-medium text-white">{skill.name}</p>
+                      <p className="text-xs text-zinc-500">{skill.branch}</p>
+                      <p className="text-xs text-zinc-400 mt-1">{skill.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Skill Branches */}
             <div className="space-y-4">
@@ -408,98 +352,47 @@ export default function Home() {
         {/* BLUEPRINTS TAB */}
         {activeTab === 'blueprints' && (
           <div className="space-y-6">
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 text-center">
-                <p className="text-2xl font-bold text-yellow-500">{blueprintStats.owned}/{blueprintStats.total}</p>
-                <p className="text-xs text-zinc-500">Total Collected</p>
-              </div>
-              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 text-center">
-                <p className="text-2xl font-bold text-red-400">{blueprintStats.essentialOwned}/{blueprintStats.essentialTotal}</p>
-                <p className="text-xs text-zinc-500">Essential</p>
-              </div>
-              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 text-center">
-                <div className="w-full bg-zinc-700 rounded-full h-3 mb-1">
-                  <div className="bg-yellow-500 h-3 rounded-full" style={{ width: `${(blueprintStats.owned / blueprintStats.total) * 100}%` }} />
-                </div>
-                <p className="text-xs text-zinc-500">{Math.round((blueprintStats.owned / blueprintStats.total) * 100)}% Complete</p>
-              </div>
-              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 text-center">
-                <p className="text-2xl font-bold text-green-400">{blueprintStats.total - blueprintStats.owned}</p>
-                <p className="text-xs text-zinc-500">Remaining</p>
-              </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+              <input
+                type="text"
+                placeholder="Search blueprints by name, description, or location..."
+                value={blueprintSearch}
+                onChange={(e) => setBlueprintSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
             </div>
 
-            {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <div className="lg:col-span-2 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                <input
-                  type="text"
-                  placeholder="Search blueprints..."
-                  value={blueprintSearch}
-                  onChange={(e) => setBlueprintSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
-              <select value={blueprintFilter} onChange={e => setBlueprintFilter(e.target.value as typeof blueprintFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
-                <option value="all">All Blueprints</option>
-                <option value="owned">Owned</option>
-                <option value="missing">Missing</option>
-              </select>
-              <select value={workbenchFilter} onChange={e => setWorkbenchFilter(e.target.value)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
-                <option value="all">All Workbenches</option>
-                <option value="gunsmith">Gunsmith</option>
-                <option value="gear-bench">Gear Bench</option>
-                <option value="medical-lab">Medical Lab</option>
-                <option value="utility-station">Utility Station</option>
-                <option value="explosives-station">Explosives</option>
-                <option value="refiner">Refiner</option>
-              </select>
-              <select value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
-                <option value="all">All Priority</option>
-                <option value="Essential">Essential</option>
-                <option value="High Value">High Value</option>
-                <option value="Situational">Situational</option>
-                <option value="Low Priority">Low Priority</option>
-              </select>
-            </div>
-
-            <p className="text-zinc-500">{filteredBlueprints.length} blueprints found</p>
+            <p className="text-sm text-zinc-500">
+              {filteredBlueprints.length} blueprint{filteredBlueprints.length === 1 ? '' : 's'} match your search.
+            </p>
 
             {/* Blueprint Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {filteredBlueprints.map(bp => {
-                const owned = ownedBlueprints.includes(bp.id);
-                return (
-                  <div
-                    key={bp.id}
-                    onClick={() => toggleBlueprint(bp.id)}
-                    className={`bg-zinc-800 rounded-lg p-4 border cursor-pointer transition-all ${
-                      owned ? 'border-green-500 bg-green-500/10' : 'border-zinc-700 hover:border-zinc-600'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className={`font-medium ${owned ? 'text-green-400' : 'text-white'}`}>{bp.name}</h3>
-                      <input type="checkbox" checked={owned} onChange={() => {}} className="w-5 h-5 accent-green-500" />
-                    </div>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">{bp.type}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[bp.priority]}`}>{bp.priority}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${rarityColors[bp.rarity]} bg-zinc-700`}>{bp.rarity}</span>
-                    </div>
-                    <p className="text-xs text-zinc-500 mb-1">L{bp.requiredLevel} {bp.workbench.replace(/-/g, ' ')}</p>
-                    <p className="text-sm text-zinc-400">{bp.description}</p>
-                    {bp.location && (
-                      <div className="mt-2 flex items-start gap-1">
-                        <MapPin size={12} className="text-amber-400 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-amber-400">{bp.location}</p>
-                      </div>
-                    )}
-                    {bp.soloNote && <p className="text-xs text-yellow-500/80 mt-1">{bp.soloNote}</p>}
+              {filteredBlueprints.map(bp => (
+                <div key={bp.id} className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 hover:border-yellow-500/40 transition">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-medium text-white">{bp.name}</h3>
+                    <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-300">
+                      {bp.workbench.replace(/-/g, ' ')}
+                    </span>
                   </div>
-                );
-              })}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">{bp.type}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[bp.priority]}`}>{bp.priority}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${rarityColors[bp.rarity]} bg-zinc-700`}>{bp.rarity}</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 mb-1">Requires level {bp.requiredLevel}</p>
+                  <p className="text-sm text-zinc-400">{bp.description}</p>
+                  {bp.location && (
+                    <div className="mt-2 flex items-start gap-1">
+                      <MapPin size={12} className="text-amber-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-amber-400">{bp.location}</p>
+                    </div>
+                  )}
+                  {bp.soloNote && <p className="text-xs text-yellow-500/80 mt-1">{bp.soloNote}</p>}
+                </div>
+              ))}
             </div>
           </div>
         )}
