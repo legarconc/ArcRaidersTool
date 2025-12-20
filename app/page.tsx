@@ -49,6 +49,8 @@ const priorityColors: Record<string, string> = {
   'Low Priority': 'text-zinc-400 bg-zinc-500/20'
 };
 
+const LAST_UPDATE = 'December 20, 2025';
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('loot');
 
@@ -152,8 +154,11 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-20 bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-bold text-yellow-500">ARC Raiders Companion</h1>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-3">
+            <div>
+              <h1 className="text-xl font-bold text-yellow-500">ARC Raiders Companion</h1>
+              <p className="text-xs text-zinc-400 uppercase tracking-wide">Last update: {LAST_UPDATE}</p>
+            </div>
             <div className="flex gap-2">
               <button onClick={handleExport} className="flex items-center gap-1 px-3 py-1 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-lg">
                 <Download size={14} /> Export
