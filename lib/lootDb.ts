@@ -255,6 +255,7 @@ const rawLootDb: BaseItem[] = [
   { name: 'Ion Sputter', status: 'KEEP', reason: 'Expedition Project material', location: 'Rare containers' },
   { name: 'Geiger Counter', status: 'KEEP', reason: 'Expedition Project material', location: 'Industrial POIs' },
   { name: 'Candleberry', status: 'KEEP', reason: 'Quest item (Candleberry Banquet Project)', location: 'Various maps (Cold Snap)' },
+  { name: 'Seeker Grenade', status: 'KEEP', reason: 'Essential for countering Airborne ARC threats.', location: 'Security Lockers, various POIs' },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // KEEP - KEYS (Always Keep - Open Rare Loot Rooms)
@@ -643,6 +644,7 @@ const lootMetadata: Record<string, { rarity: Rarity; locationTag: LocationTag }>
   'Torn Blanket': { rarity: 'Common', locationTag: 'Residential' },
   'Unusable Weapon': { rarity: 'Common', locationTag: 'Various' },
   'Candleberry': { rarity: 'Common', locationTag: 'Nature' },
+  'Seeker Grenade': { rarity: 'Rare', locationTag: 'Various' },
   'Guitar': { rarity: 'Rare', locationTag: 'Residential' },
 } as const;
 

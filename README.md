@@ -4,16 +4,17 @@ A browser-based companion for **Arc Raiders** solo players. Features a comprehen
 
 **Live App:** https://legarconc.github.io/ArcRaidersTool/
 
-*Last updated: December 20, 2025 (v1.7.0 "Cold Snap" Update)*
+*Last updated: February 13, 2026 (Escalation Season: "Shrouded Sky" Update)*
 
 ## Features
 
-### Loot Database (212+ items)
+### Loot Database (215+ items)
 - Every item tagged with **KEEP**, **SELL**, **RECYCLE**, or **USE** status
 - Clear reasoning for each recommendation (quest requirements, workshop upgrades, crafting materials)
 - Location tags: ARC, Industrial, Residential, Commercial, Nature, Medical, Military, Topside, Crafting
 - Expandable map-specific farming hotspots with tips
 - Filter by status, rarity, location type, and search
+- **New:** Includes specialized counters for Airborne ARC threats
 
 ### Skills Guide (3 trees, 75 points)
 - **Mobility** (Priority #1) — Stamina management, movement speed, parkour
@@ -25,18 +26,28 @@ A browser-based companion for **Arc Raiders** solo players. Features a comprehen
 - Skip List — Highlights low-impact perks you can safely ignore until endgame
 - Priority ratings (Critical, High, Medium, Optional) for each skill
 - Prerequisite requirements for every major unlock
+- **Note:** March 2026 "Second Expedition" catch-up system details included
 
-### Blueprints Catalog (55+ blueprints)
+### Blueprints Catalog (75+ blueprints)
 - All blueprints with **drop locations** and farming tips
 - Categories: Weapons, Attachments, Shields, Augments, Consumables, Tools, Explosives, Components
 - Priority ratings: Essential, High Value, Situational, Low Priority
 - Lightweight search for names, descriptions, or locations — no ownership tracking UI
 
 **Notable blueprints with guaranteed sources:**
+- **Kettle AR** — Stealth focused S-Tier (capped at 450 RPM in 1.11.0)
+- **Seeker Grenade** — Essential airborne counter (Shared Watch event reward)
+- **Survivor Mk.3 Safekeeper** — High Loot Zones (Major Map Conditions)
 - Hullcracker — Quest: The Major's Footlocker (Tian Wen)
 - Burletta — Quest: Industrial Espionage (Tian Wen)
 - Lure Grenade — Quest: Greasing Her Palms (Celeste)
 - Equalizer/Jupiter — Harvester Events
+
+## Escalation Season Roadmap (2026)
+- **January:** "Headwinds" - Solo vs Squads, Bird City Map Condition.
+- **February:** "Shrouded Sky" - Airborne ARC threats, Shared Watch Event.
+- **March:** "Flashpoint" - New ARC enemy, Second Expedition (Skill Point Catch-up).
+- **April:** "Riven Tides" - Brand-new map.
 
 ## Getting Started
 

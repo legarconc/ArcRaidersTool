@@ -48,7 +48,7 @@ const priorityColors: Record<string, string> = {
   'Low Priority': 'text-zinc-400 bg-zinc-500/20'
 };
 
-const LAST_UPDATE = 'December 20, 2025';
+const LAST_UPDATE = 'February 13, 2026';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('loot');
@@ -123,7 +123,10 @@ export default function Home() {
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-3">
             <div>
               <h1 className="text-xl font-bold text-yellow-500">ARC Raiders Companion</h1>
-              <p className="text-xs text-zinc-400 uppercase tracking-wide">Last update: {LAST_UPDATE}</p>
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-xs text-zinc-400 uppercase tracking-wide">Last update: {LAST_UPDATE}</p>
+                <span className="text-[10px] bg-yellow-500/10 text-yellow-500 px-2 py-0.5 rounded border border-yellow-500/20 font-bold uppercase">Escalation Season Roadmap</span>
+              </div>
             </div>
           </div>
           {/* Tabs */}

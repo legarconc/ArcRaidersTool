@@ -20,6 +20,7 @@ export interface SkillBranch {
 }
 
 export const skillBranches: SkillBranch[] = [
+  // NOTE: The "Second Expedition" update (March 2026) introduces a skill point catch-up system.
   {
     id: 'mobility',
     name: 'Mobility',

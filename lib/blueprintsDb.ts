@@ -40,6 +40,18 @@ export const blueprints: Blueprint[] = [
     soloNote: 'S-Tier. Expensive to run, but shreds everything. Now even better sustained fire.'
   },
   {
+    id: 'kettle',
+    name: 'Kettle AR',
+    workbench: 'gunsmith',
+    requiredLevel: 1,
+    type: 'Weapon',
+    rarity: 'Common',
+    priority: 'High Value',
+    description: 'Ultra-quiet semi-auto AR. Fire rate capped in 1.11.0 to 450 RPM.',
+    location: 'Common containers, Bird City Map Condition',
+    soloNote: 'S-Tier for stealth. One of the quietest guns. Low recoil makes it a laser.'
+  },
+  {
     id: 'rattler',
     name: 'Rattler AR',
     workbench: 'gunsmith',
@@ -343,6 +355,174 @@ export const blueprints: Blueprint[] = [
     location: 'Weapon Cases',
     soloNote: 'Essential if running shotguns.'
   },
+  {
+    id: 'shotgun-choke-3',
+    name: 'Shotgun Choke III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'Situational',
+    description: 'Maximum shotgun spread tightening.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for shotgun builds.'
+  },
+  {
+    id: 'silencer-1',
+    name: 'Silencer I',
+    workbench: 'gunsmith',
+    requiredLevel: 1,
+    type: 'Attachment',
+    rarity: 'Uncommon',
+    priority: 'High Value',
+    description: 'Basic noise reduction for weapons.',
+    location: 'Common containers, Weapon Cases',
+    soloNote: 'Good starter suppressor until you find Silencer II.'
+  },
+  {
+    id: 'angled-grip-3',
+    name: 'Angled Grip III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'Situational',
+    description: 'Maximum weapon handling improvement.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for hip-fire builds.'
+  },
+  {
+    id: 'vertical-grip-3',
+    name: 'Vertical Grip III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'High Value',
+    description: 'Maximum recoil control.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Excellent alternative to Compensator III.'
+  },
+  {
+    id: 'stable-stock-3',
+    name: 'Stable Stock III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'High Value',
+    description: 'Maximum accuracy when stationary.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for sniper builds.'
+  },
+  {
+    id: 'extended-light-mag-2',
+    name: 'Extended Light Magazine II',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Increases magazine capacity for light caliber weapons.',
+    location: 'Weapon Cases, Security Lockers',
+    soloNote: 'Useful for SMGs and pistols.'
+  },
+  {
+    id: 'extended-light-mag-3',
+    name: 'Extended Light Magazine III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'Situational',
+    description: 'Maximum magazine capacity for SMGs and pistols.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for Burletta builds.'
+  },
+  {
+    id: 'extended-shotgun-mag-2',
+    name: 'Extended Shotgun Magazine II',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Increases shotgun tube capacity.',
+    location: 'Weapon Cases, Security Lockers',
+    soloNote: 'Essential for Vulcano builds.'
+  },
+  {
+    id: 'extended-shotgun-mag-3',
+    name: 'Extended Shotgun Magazine III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'Situational',
+    description: 'Maximum shotgun tube capacity.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for shotgun mains.'
+  },
+  {
+    id: 'muzzle-brake-2',
+    name: 'Muzzle Brake II',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Reduces vertical recoil.',
+    location: 'Weapon Cases, Security Lockers',
+    soloNote: 'Good for sniper rifles and battle rifles.'
+  },
+  {
+    id: 'muzzle-brake-3',
+    name: 'Muzzle Brake III',
+    workbench: 'gunsmith',
+    requiredLevel: 3,
+    type: 'Attachment',
+    rarity: 'Epic',
+    priority: 'High Value',
+    description: 'Maximum vertical recoil reduction.',
+    location: 'Security Lockers (requires Security Breach skill)',
+    soloNote: 'Best-in-slot for Osprey and Renegade.'
+  },
+  {
+    id: 'shotgun-silencer',
+    name: 'Shotgun Silencer',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Reduces shotgun noise significantly.',
+    location: 'Weapon Cases, Security Lockers',
+    soloNote: 'Niche but useful for stealth shotgun builds.'
+  },
+  {
+    id: 'padded-stock',
+    name: 'Padded Stock',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Low Priority',
+    description: 'Reduces weapon sway and improves ADS stability.',
+    location: 'Weapon Cases, various containers',
+    soloNote: 'Minor benefit. Other stocks are better.'
+  },
+  {
+    id: 'lightweight-stock',
+    name: 'Lightweight Stock',
+    workbench: 'gunsmith',
+    requiredLevel: 2,
+    type: 'Attachment',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Reduces weapon weight and improves ADS speed.',
+    location: 'Weapon Cases, various containers',
+    soloNote: 'Good for run-and-gun builds where weight matters.'
+  },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // GEAR BENCH
@@ -406,6 +586,30 @@ export const blueprints: Blueprint[] = [
     description: 'Greatly increases loot detection and highlights items through walls.',
     location: 'Security Lockers, Buried City Pharmacy',
     soloNote: 'S-Tier. Wallhacks for loot. Never raid without it.'
+  },
+  {
+    id: 'looting-mk3-safekeeper',
+    name: 'Looting Mk.3 (Safekeeper)',
+    workbench: 'gear-bench',
+    requiredLevel: 3,
+    type: 'Augment',
+    rarity: 'Epic',
+    priority: 'Essential',
+    description: '18 item slots, Heavy Shield compatible. Features a "Safe Pocket" that protects any item from loss upon death.',
+    location: 'High Loot Zones during Major Map Conditions',
+    soloNote: 'S-Tier. The ultimate safety net for your most valuable items. Added in Headwinds 1.13.0.'
+  },
+  {
+    id: 'tactical-mk3-revival',
+    name: 'Tactical Mk.3 (Revival)',
+    workbench: 'gear-bench',
+    requiredLevel: 3,
+    type: 'Augment',
+    rarity: 'Epic',
+    priority: 'High Value',
+    description: 'Integrated Defibrillator for free revives (4m CD) and passive health regen.',
+    location: 'High Loot Zones during Major Map Conditions',
+    soloNote: 'A-Tier. Only compatible with Light Shields. Great for sustain.'
   },
   {
     id: 'tactical-mk3-defensive',
@@ -524,6 +728,18 @@ export const blueprints: Blueprint[] = [
     soloNote: 'A-Tier. Excellent for disengaging from fights.'
   },
   {
+    id: 'seeker-grenade',
+    name: 'Seeker Grenade',
+    workbench: 'utility-station',
+    requiredLevel: 2,
+    type: 'Tool',
+    rarity: 'Rare',
+    priority: 'Essential',
+    description: 'Homing grenade that targets and disables airborne ARC threats.',
+    location: 'Security Lockers, Reward for Shared Watch event',
+    soloNote: 'S-Tier for Shrouded Sky update. Hard counters new flying enemies.'
+  },
+  {
     id: 'tagging-grenade',
     name: 'Tagging Grenade',
     workbench: 'utility-station',
@@ -576,6 +792,18 @@ export const blueprints: Blueprint[] = [
     soloNote: 'S-Tier. Essential for distracting ARCs while looting.'
   },
   {
+    id: 'trailblazer-grenade',
+    name: 'Trailblazer Grenade',
+    workbench: 'explosives-station',
+    requiredLevel: 2,
+    type: 'Explosive',
+    rarity: 'Rare',
+    priority: 'High Value',
+    description: 'Emits a trail of flammable gas that ignites for an explosive chain reaction.',
+    location: 'Security Lockers, Industrial POIs',
+    soloNote: 'A-Tier. Massive area damage. Balanced in 1.15.0 for better scaling.'
+  },
+  {
     id: 'showstopper',
     name: 'Showstopper',
     workbench: 'explosives-station',
@@ -622,6 +850,30 @@ export const blueprints: Blueprint[] = [
     description: 'Stuns enemies in radius.',
     location: 'Explosives containers, various POIs',
     soloNote: 'B-Tier. Useful for escape routes.'
+  },
+  {
+    id: 'gas-mine',
+    name: 'Gas Mine',
+    workbench: 'explosives-station',
+    requiredLevel: 2,
+    type: 'Explosive',
+    rarity: 'Rare',
+    priority: 'Situational',
+    description: 'Releases toxic gas cloud when triggered.',
+    location: 'Explosives containers, Industrial POIs',
+    soloNote: 'B-Tier. Good area denial but can affect you too.'
+  },
+  {
+    id: 'pulse-mine',
+    name: 'Pulse Mine',
+    workbench: 'explosives-station',
+    requiredLevel: 2,
+    type: 'Explosive',
+    rarity: 'Rare',
+    priority: 'High Value',
+    description: 'EMP mine that disables ARC enemies temporarily.',
+    location: 'Explosives containers, Military POIs',
+    soloNote: 'A-Tier. Excellent for disabling groups of ARCs.'
   },
   {
     id: 'wolfpack',
