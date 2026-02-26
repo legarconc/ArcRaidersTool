@@ -33,6 +33,11 @@ A browser-based companion for **Arc Raiders** players. Features a comprehensive 
 - All locker locations requiring the **Security Breach** skill marked on each map
 - Scroll to zoom on desktop · Pinch to zoom on mobile · Drag to pan
 
+### Projects
+- Full breakdown of all in-game projects: Expedition, Weather Monitor System, Trophy Display, Flickering Flames
+- Per-stage material requirements and rewards
+- Status badges: Active, Recurring, Past
+
 ### UI/UX & Accessibility
 - **High-Contrast Design:** Near-black palette with bright yellow accents and light grey text for maximum readability on OLED and standard displays.
 - **Large Typography:** Generous font sizes optimized for quick reference during gameplay.
@@ -106,11 +111,16 @@ const nextConfig: NextConfig = {
   basePath: "/ArcRaidersTool",
   assetPrefix: "/ArcRaidersTool",
   images: { unoptimized: true },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: process.env.NODE_ENV === "production" ? "/ArcRaidersTool" : "",
+  },
 };
 ```
+
+`NEXT_PUBLIC_BASE_PATH` is empty during `next dev` (public files served at `/`) and set to `/ArcRaidersTool` in production builds (required for correct asset paths on GitHub Pages).
 
 ### Forking
 
 1. Go to **Settings → Pages** and set Source to "GitHub Actions"
-2. Update `basePath` and `assetPrefix` to match your repo name
+2. Update `basePath`, `assetPrefix`, and `NEXT_PUBLIC_BASE_PATH` to match your repo name
 3. Push to `main` — deploys automatically

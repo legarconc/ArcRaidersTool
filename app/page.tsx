@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import type { LucideIcon } from 'lucide-react';
 import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin, Map, Briefcase } from 'lucide-react';
@@ -609,14 +608,11 @@ export default function Home() {
                         wrapperStyle={{ width: '100%', height: '100%' }}
                         contentStyle={{ width: '100%' }}
                       >
-                        <Image
-                          src={`/maps/${map.file}`}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_BASE_PATH}/maps/${map.file}`}
                           alt={map.label}
-                          width={0}
-                          height={0}
-                          sizes="100vw"
                           style={{ width: '100%', height: 'auto', display: 'block' }}
-                          priority
                         />
                       </TransformComponent>
                     </>
