@@ -51,7 +51,7 @@ const mapLocationGuides: Record<LocationTag, MapLocation[]> = {
   Residential: [
     { map: 'Blue Gate', hotspot: 'Olive Grove villas', tip: 'Kitchen pantries restock fruit needed for Scrappy upgrades.' },
     { map: 'Buried City', hotspot: 'Apartment blocks', tip: 'Hit the top floors for medical cabinets and household parts.' },
-    { map: 'Topside Outskirts', hotspot: 'Suburban cul-de-sacs', tip: 'Low-risk houses—good for quick solo runs.' }
+    { map: 'Topside Outskirts', hotspot: 'Suburban cul-de-sacs', tip: 'Low-risk houses—good for quick loot runs.' }
   ],
   Commercial: [
     { map: 'Blue Gate', hotspot: 'Marketplace strip', tip: 'Sports and electronics stores yield gun parts and attachments.' },
@@ -126,7 +126,7 @@ const rawLootDb: BaseItem[] = [
   // KEEP - ARC ENEMY PARTS (Quest & Upgrade Essential)
   // ═══════════════════════════════════════════════════════════════════════════
   { name: 'Leaper Pulse Unit', status: 'KEEP', reason: 'Quest item, Utility Station III, Expedition', location: 'Leaper enemies' },
-  { name: 'Rocketeer Driver', status: 'KEEP', reason: 'Quest item, Explosives Station III', location: 'Rocketeer enemies' },
+  { name: 'Rocketeer Driver', status: 'KEEP', reason: 'Quest item, Wolfpack crafting (1.17.0), Explosives Station III', location: 'Rocketeer enemies, electrified husks, electromagnetic storms' },
   { name: 'Surveyor Vault', status: 'KEEP', reason: 'Quest item, Medical Lab III', location: 'Surveyor enemies' },
   { name: 'Hornet Driver', status: 'KEEP', reason: 'Quest item, Gear Bench II', location: 'Hornet enemies' },
   { name: 'Wasp Driver', status: 'KEEP', reason: 'Quest item, Gunsmith II', location: 'Wasp enemies' },
@@ -138,6 +138,8 @@ const rawLootDb: BaseItem[] = [
   { name: 'Tick Pod', status: 'KEEP', reason: 'Medical Lab II upgrade', location: 'Tick enemies' },
   { name: 'Fireball Burner', status: 'KEEP', reason: 'Quest item, Refiner II', location: 'Fireball enemies' },
   { name: 'Pop Trigger', status: 'KEEP', reason: 'Explosives Station II upgrade', location: 'Pop enemies' },
+  { name: 'Firefly Burner', status: 'KEEP', reason: 'Quest item for Weather Monitor System', location: 'Firefly enemies' },
+  { name: 'Comet Igniter', status: 'KEEP', reason: 'Quest item for Weather Monitor System and crafting Deadline weapons', location: 'Comet enemies (must kill before self-destruct)' },
   { name: 'Queen Reactor', status: 'KEEP', reason: 'Rare boss drop, sells for 34,000₡', location: 'Queen boss' },
   { name: 'Matriarch Reactor', status: 'KEEP', reason: 'Rare boss drop', location: 'Matriarch boss' },
   { name: 'Power Rod', status: 'KEEP', reason: 'Quest item (Tribute to Toledo)', location: 'Rare ARC drops' },
@@ -288,6 +290,7 @@ const rawLootDb: BaseItem[] = [
   // KEEP - MISCELLANEOUS
   // ═══════════════════════════════════════════════════════════════════════════
   { name: 'Volcanic Rock', status: 'KEEP', reason: 'Crafting material', location: 'Volcanic areas' },
+  { name: 'Anemometer Backpack Charm', status: 'KEEP', reason: 'Reward for Weather Monitoring System seasonal project', location: 'Weather Monitoring System seasonal project' },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SELL - TRINKETS (High Value - $5000+)
@@ -443,6 +446,8 @@ const lootMetadata: Record<string, { rarity: Rarity; locationTag: LocationTag }>
   'Sentinel Firing Core': { rarity: 'Rare', locationTag: 'ARC' },
   'Tick Pod': { rarity: 'Uncommon', locationTag: 'ARC' },
   'Fireball Burner': { rarity: 'Common', locationTag: 'ARC' },
+  'Firefly Burner': { rarity: 'Rare', locationTag: 'ARC' },
+  'Comet Igniter': { rarity: 'Rare', locationTag: 'ARC' },
   'Pop Trigger': { rarity: 'Uncommon', locationTag: 'ARC' },
   'Queen Reactor': { rarity: 'Legendary', locationTag: 'ARC' },
   'Matriarch Reactor': { rarity: 'Legendary', locationTag: 'ARC' },
@@ -548,6 +553,7 @@ const lootMetadata: Record<string, { rarity: Rarity; locationTag: LocationTag }>
   'Stella Montis Medical Storage Key': { rarity: 'Rare', locationTag: 'Various' },
   'Stella Montis Security Checkpoint Key': { rarity: 'Rare', locationTag: 'Various' },
   'Volcanic Rock': { rarity: 'Common', locationTag: 'Various' },
+  'Anemometer Backpack Charm': { rarity: 'Rare', locationTag: 'Various' },
   'Lance\'s Mixtape (5th Edition)': { rarity: 'Epic', locationTag: 'Various' },
   'Breathtaking Snow Globe': { rarity: 'Epic', locationTag: 'Residential' },
   'Playing Cards': { rarity: 'Rare', locationTag: 'Residential' },

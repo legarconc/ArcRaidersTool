@@ -8,7 +8,6 @@ export interface Blueprint {
   priority: 'Essential' | 'High Value' | 'Situational' | 'Low Priority';
   description: string;
   location?: string;
-  soloNote?: string;
 }
 
 export const blueprints: Blueprint[] = [
@@ -25,7 +24,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'High-damage hand cannon with great economy.',
     location: 'Security Lockers, Weapon Cases, Dam Battlegrounds Control Tower',
-    soloNote: 'S-Tier. Hits harder than most rifles. Very ammo efficient.'
   },
   {
     id: 'bettina',
@@ -37,7 +35,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Top-tier Assault Rifle. Buffed in 1.7.0 (Mag 22, Faster Reload).',
     location: 'Dynamic Security Lockers, High-Value Containers, Night Raids',
-    soloNote: 'S-Tier. Expensive to run, but shreds everything. Now even better sustained fire.'
   },
   {
     id: 'kettle',
@@ -47,9 +44,8 @@ export const blueprints: Blueprint[] = [
     type: 'Weapon',
     rarity: 'Common',
     priority: 'High Value',
-    description: 'Ultra-quiet semi-auto AR. Fire rate capped in 1.11.0 to 450 RPM.',
+    description: 'Ultra-quiet semi-auto AR. Fire rate capped in 1.11.0 to 450 RPM. TTK increased in 1.17.0.',
     location: 'Common containers, Bird City Map Condition',
-    soloNote: 'S-Tier for stealth. One of the quietest guns. Low recoil makes it a laser.'
   },
   {
     id: 'rattler',
@@ -61,7 +57,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Fully automatic assault rifle. Good starter weapon.',
     location: 'Common containers, early quests',
-    soloNote: 'B-Tier. Reliable starter, buffed PvP TTK in 1.7.0.'
   },
   {
     id: 'renegade',
@@ -73,7 +68,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Lever-action battle rifle. High accuracy and headshot damage.',
     location: 'Security Lockers, Weapon Cases',
-    soloNote: 'A-Tier. Versatile and fast when upgraded.'
   },
   {
     id: 'tempest',
@@ -85,7 +79,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Versatile assault rifle, good at all ranges.',
     location: 'Weapon Cases, Blue Gate Reinforced Reception, Security Lockers',
-    soloNote: 'A-Tier. Reliable and economical alternative to Bettina.'
   },
   {
     id: 'osprey',
@@ -97,7 +90,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Long-range precision rifle with high damage.',
     location: 'Security Lockers, Military Containers, Dam Control Tower',
-    soloNote: 'Best starter sniper. Essential for picking off Rocketeers from distance.'
   },
   {
     id: 'vulcano',
@@ -109,7 +101,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Semi-auto shotgun with massive close-range damage.',
     location: 'Security Lockers, Blue Gate Village (requires key)',
-    soloNote: 'King of close quarters, but useless at range. Pair with AR.'
   },
   {
     id: 'burletta',
@@ -121,7 +112,17 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'High fire rate SMG with good handling.',
     location: 'Quest reward: Industrial Espionage (Tian Wen, Buried City)',
-    soloNote: 'A-Tier. Great for close-mid range combat.'
+  },
+  {
+    id: 'stitcher',
+    name: 'Stitcher SMG',
+    workbench: 'gunsmith',
+    requiredLevel: 1,
+    type: 'Weapon',
+    rarity: 'Common',
+    priority: 'High Value',
+    description: 'High rate of fire SMG. Nerfed in 1.17.0 (damage, headshot multiplier, and accuracy).',
+    location: 'Common containers, frequently found on other raiders',
   },
   {
     id: 'bobcat',
@@ -133,7 +134,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Low Priority',
     description: 'Basic starter pistol.',
     location: 'Common containers, early quests',
-    soloNote: 'Replace with Anvil as soon as possible.'
   },
   {
     id: 'torrente',
@@ -145,7 +145,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Light machine gun with large magazine.',
     location: 'Security Lockers, Military POIs, Harvester Events',
-    soloNote: 'Heavy and loud but great suppression. Better for squads.'
   },
   {
     id: 'venator',
@@ -155,9 +154,8 @@ export const blueprints: Blueprint[] = [
     type: 'Weapon',
     rarity: 'Rare',
     priority: 'Situational',
-    description: 'Semi-auto marksman rifle.',
+    description: 'Semi-auto marksman rifle. TTK increased in 1.17.0.',
     location: 'Security Lockers, Weapon Cases',
-    soloNote: 'B-Tier. Decent mid-range option but outclassed by Osprey.'
   },
   {
     id: 'aphelion',
@@ -167,9 +165,8 @@ export const blueprints: Blueprint[] = [
     type: 'Weapon',
     rarity: 'Legendary',
     priority: 'High Value',
-    description: 'Legendary Battle Rifle. Fires two-round bursts of high-velocity energy rounds.',
+    description: 'Legendary Battle Rifle. Fires two-round bursts of high-velocity energy rounds. Buffed handling and maneuverability in 1.17.0.',
     location: 'Stella Montis (Moved in 1.7.0)',
-    soloNote: 'S-Tier. Strong against ARC armor plating.'
   },
   {
     id: 'il-toro',
@@ -181,7 +178,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Heavy revolver with high damage per shot.',
     location: 'Security Lockers, Buried City residential areas',
-    soloNote: 'High risk/reward. 6 shots to make count.'
   },
   {
     id: 'hullcracker',
@@ -193,7 +189,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Devastating railgun requiring Magnetic Accelerator, Heavy Gun Parts, and Exodus Module.',
     location: "Quest reward: The Major's Footlocker (Tian Wen, Dam Battlegrounds)",
-    soloNote: 'S-Tier endgame weapon. One-shots most enemies.'
   },
   {
     id: 'equalizer',
@@ -205,7 +200,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Legendary energy weapon. Requires Magnetic Accelerator, Complex Gun Parts, Queen Reactor.',
     location: 'Harvester Events (guaranteed drop)',
-    soloNote: 'Endgame weapon. Farm Harvester events for blueprint.'
   },
   {
     id: 'jupiter',
@@ -215,9 +209,8 @@ export const blueprints: Blueprint[] = [
     type: 'Weapon',
     rarity: 'Legendary',
     priority: 'High Value',
-    description: 'Legendary heavy weapon. Same requirements as Equalizer.',
+    description: 'Legendary heavy weapon. Same requirements as Equalizer. Buffed handling and maneuverability in 1.17.0.',
     location: 'Harvester Events (guaranteed drop)',
-    soloNote: 'Endgame alternative to Equalizer. Team-oriented.'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -233,7 +226,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Reduces weapon noise significantly.',
     location: 'Security Lockers, Weapon Cases',
-    soloNote: 'Critical for solo stealth. Pair with suppressed weapons.'
   },
   {
     id: 'silencer-3',
@@ -245,7 +237,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Maximum noise reduction.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot silencer.'
   },
   {
     id: 'compensator-2',
@@ -257,7 +248,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Reduces weapon recoil.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Great for full-auto weapons.'
   },
   {
     id: 'compensator-3',
@@ -269,7 +259,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Maximum recoil reduction.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Essential for Bettina and LMGs.'
   },
   {
     id: 'extended-medium-mag-2',
@@ -281,7 +270,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Increases magazine capacity for medium caliber weapons.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'More bullets = more survivability in fights.'
   },
   {
     id: 'extended-medium-mag-3',
@@ -293,7 +281,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Maximum magazine capacity for ARs.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Must-have for extended fights.'
   },
   {
     id: 'angled-grip-2',
@@ -305,7 +292,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Improves weapon handling.',
     location: 'Weapon Cases, various containers',
-    soloNote: 'Good for hip-fire builds.'
   },
   {
     id: 'vertical-grip-2',
@@ -317,7 +303,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Improves recoil control.',
     location: 'Weapon Cases, various containers',
-    soloNote: 'Alternative to Compensator.'
   },
   {
     id: 'stable-stock-2',
@@ -329,7 +314,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Improves accuracy when stationary.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Best for snipers.'
   },
   {
     id: 'extended-barrel',
@@ -341,7 +325,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Increases effective range.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Good for marksman builds.'
   },
   {
     id: 'shotgun-choke-2',
@@ -353,7 +336,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Tightens shotgun spread.',
     location: 'Weapon Cases',
-    soloNote: 'Essential if running shotguns.'
   },
   {
     id: 'shotgun-choke-3',
@@ -365,7 +347,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Maximum shotgun spread tightening.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for shotgun builds.'
   },
   {
     id: 'silencer-1',
@@ -377,7 +358,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Basic noise reduction for weapons.',
     location: 'Common containers, Weapon Cases',
-    soloNote: 'Good starter suppressor until you find Silencer II.'
   },
   {
     id: 'angled-grip-3',
@@ -389,7 +369,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Maximum weapon handling improvement.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for hip-fire builds.'
   },
   {
     id: 'vertical-grip-3',
@@ -401,7 +380,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Maximum recoil control.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Excellent alternative to Compensator III.'
   },
   {
     id: 'stable-stock-3',
@@ -413,7 +391,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Maximum accuracy when stationary.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for sniper builds.'
   },
   {
     id: 'extended-light-mag-2',
@@ -425,7 +402,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Increases magazine capacity for light caliber weapons.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Useful for SMGs and pistols.'
   },
   {
     id: 'extended-light-mag-3',
@@ -437,7 +413,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Maximum magazine capacity for SMGs and pistols.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for Burletta builds.'
   },
   {
     id: 'extended-shotgun-mag-2',
@@ -449,7 +424,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Increases shotgun tube capacity.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Essential for Vulcano builds.'
   },
   {
     id: 'extended-shotgun-mag-3',
@@ -461,7 +435,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Maximum shotgun tube capacity.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for shotgun mains.'
   },
   {
     id: 'muzzle-brake-2',
@@ -473,7 +446,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Reduces vertical recoil.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Good for sniper rifles and battle rifles.'
   },
   {
     id: 'muzzle-brake-3',
@@ -485,7 +457,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Maximum vertical recoil reduction.',
     location: 'Security Lockers (requires Security Breach skill)',
-    soloNote: 'Best-in-slot for Osprey and Renegade.'
   },
   {
     id: 'shotgun-silencer',
@@ -497,7 +468,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Reduces shotgun noise significantly.',
     location: 'Weapon Cases, Security Lockers',
-    soloNote: 'Niche but useful for stealth shotgun builds.'
   },
   {
     id: 'padded-stock',
@@ -509,7 +479,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Low Priority',
     description: 'Reduces weapon sway and improves ADS stability.',
     location: 'Weapon Cases, various containers',
-    soloNote: 'Minor benefit. Other stocks are better.'
   },
   {
     id: 'lightweight-stock',
@@ -521,7 +490,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Reduces weapon weight and improves ADS speed.',
     location: 'Weapon Cases, various containers',
-    soloNote: 'Good for run-and-gun builds where weight matters.'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -537,7 +505,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Balanced protection and mobility.',
     location: 'Gear Bench craft, various containers',
-    soloNote: 'Standard issue for survival. Always bring one.'
   },
   {
     id: 'shield-heavy',
@@ -549,7 +516,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Maximum protection, slower recharge.',
     location: 'Gear Bench craft, Security Lockers',
-    soloNote: 'Combine with "Used to the Weight" skill for best results.'
   },
   {
     id: 'combat-mk3-aggressive',
@@ -561,7 +527,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Damage-focused combat augment.',
     location: 'Blue Gate Reinforced Reception, Security Lockers',
-    soloNote: 'A-Tier for combat-focused builds.'
   },
   {
     id: 'combat-mk3-flanking',
@@ -573,7 +538,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Movement-focused combat augment.',
     location: 'Blue Gate Reinforced Reception, Security Lockers',
-    soloNote: 'Great for aggressive solo plays.'
   },
   {
     id: 'looting-mk3',
@@ -585,7 +549,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Greatly increases loot detection and highlights items through walls.',
     location: 'Security Lockers, Buried City Pharmacy',
-    soloNote: 'S-Tier. Wallhacks for loot. Never raid without it.'
   },
   {
     id: 'looting-mk3-safekeeper',
@@ -597,7 +560,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: '18 item slots, Heavy Shield compatible. Features a "Safe Pocket" that protects any item from loss upon death.',
     location: 'High Loot Zones during Major Map Conditions',
-    soloNote: 'S-Tier. The ultimate safety net for your most valuable items. Added in Headwinds 1.13.0.'
   },
   {
     id: 'tactical-mk3-revival',
@@ -608,8 +570,7 @@ export const blueprints: Blueprint[] = [
     rarity: 'Epic',
     priority: 'High Value',
     description: 'Integrated Defibrillator for free revives (4m CD) and passive health regen.',
-    location: 'High Loot Zones during Major Map Conditions',
-    soloNote: 'A-Tier. Only compatible with Light Shields. Great for sustain.'
+    location: 'High Loot Zones during Major Map Conditions, Surgeon Raider Deck reward',
   },
   {
     id: 'tactical-mk3-defensive',
@@ -621,7 +582,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Defense-focused tactical augment.',
     location: 'Security Lockers, Military POIs',
-    soloNote: 'B-Tier. Useful for high-risk extractions.'
   },
   {
     id: 'tactical-mk3-healing',
@@ -633,7 +593,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Healing-focused tactical augment.',
     location: 'Security Lockers, Medical POIs',
-    soloNote: 'A-Tier. Great sustain for solo.'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -649,7 +608,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Rapid healing spray with multiple uses.',
     location: 'Medical Lab craft, Medical containers',
-    soloNote: 'S-Tier. The only reliable way to heal mid-combat.'
   },
   {
     id: 'vita-shot',
@@ -661,7 +619,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Single-use healing injection.',
     location: 'Medical Lab craft, Medical containers',
-    soloNote: 'A-Tier. Quick heal but single use.'
   },
   {
     id: 'defibrillator',
@@ -673,7 +630,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Revives downed teammates faster.',
     location: 'Medical Lab craft, Medical POIs',
-    soloNote: 'Useless solo. Only for squad play.'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -689,7 +645,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Illuminates dark areas.',
     location: 'Buried City Pharmacy, Blue Gate underground',
-    soloNote: 'Useful for night raids and underground areas.'
   },
   {
     id: 'barricade-kit',
@@ -701,7 +656,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Deploys temporary cover.',
     location: 'Utility containers, Security areas',
-    soloNote: 'C-Tier. Situational for holding positions.'
   },
   {
     id: 'snap-hook',
@@ -713,7 +667,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Allows quick rappelling down cliffs.',
     location: 'Utility containers, various POIs',
-    soloNote: 'A-Tier. Essential for vertical maps like Stella Montis.'
   },
   {
     id: 'smoke-grenade',
@@ -725,7 +678,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Creates smoke cover for escapes.',
     location: 'Utility containers, various POIs',
-    soloNote: 'A-Tier. Excellent for disengaging from fights.'
   },
   {
     id: 'seeker-grenade',
@@ -737,7 +689,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Homing grenade that targets and disables airborne ARC threats.',
     location: 'Security Lockers, Reward for Shared Watch event',
-    soloNote: 'S-Tier for Shrouded Sky update. Hard counters new flying enemies.'
   },
   {
     id: 'tagging-grenade',
@@ -749,7 +700,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Marks enemies in an area.',
     location: 'Utility containers',
-    soloNote: 'B-Tier. Useful for scouting but reveals your position.'
   },
   {
     id: 'remote-raider-flare',
@@ -761,7 +711,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Low Priority',
     description: 'Signals extraction point.',
     location: 'Utility containers',
-    soloNote: 'D-Tier. Alerts everyone to your position.'
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -777,7 +726,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Remote-detonated grenade.',
     location: 'Quest reward: Sparks Fly (Apollo, any map)',
-    soloNote: 'A-Tier. Great for ambushes and traps.'
   },
   {
     id: 'lure-grenade',
@@ -789,7 +737,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Attracts ARC enemies to a location.',
     location: 'Quest reward: Greasing Her Palms (Celeste, multiple maps)',
-    soloNote: 'S-Tier. Essential for distracting ARCs while looting.'
   },
   {
     id: 'trailblazer-grenade',
@@ -801,7 +748,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Emits a trail of flammable gas that ignites for an explosive chain reaction.',
     location: 'Security Lockers, Industrial POIs',
-    soloNote: 'A-Tier. Massive area damage. Balanced in 1.15.0 for better scaling.'
   },
   {
     id: 'showstopper',
@@ -813,7 +759,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'High-damage explosive grenade.',
     location: 'Blue Gate Reinforced Reception, Security Lockers',
-    soloNote: 'A-Tier. Great burst damage for ARC hunting.'
   },
   {
     id: 'blaze-grenade',
@@ -825,7 +770,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Creates area of fire damage.',
     location: 'Explosives containers, various POIs',
-    soloNote: 'B-Tier. Good for area denial.'
   },
   {
     id: 'explosive-mine',
@@ -837,7 +781,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Proximity-triggered explosive.',
     location: 'Explosives containers, Military POIs',
-    soloNote: 'B-Tier. Good for guarding your back while looting.'
   },
   {
     id: 'jolt-mine',
@@ -849,7 +792,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Stuns enemies in radius.',
     location: 'Explosives containers, various POIs',
-    soloNote: 'B-Tier. Useful for escape routes.'
   },
   {
     id: 'gas-mine',
@@ -861,7 +803,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Situational',
     description: 'Releases toxic gas cloud when triggered.',
     location: 'Explosives containers, Industrial POIs',
-    soloNote: 'B-Tier. Good area denial but can affect you too.'
   },
   {
     id: 'pulse-mine',
@@ -873,7 +814,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'EMP mine that disables ARC enemies temporarily.',
     location: 'Explosives containers, Military POIs',
-    soloNote: 'A-Tier. Excellent for disabling groups of ARCs.'
   },
   {
     id: 'wolfpack',
@@ -883,9 +823,19 @@ export const blueprints: Blueprint[] = [
     type: 'Explosive',
     rarity: 'Epic',
     priority: 'Situational',
-    description: 'Multi-rocket launcher explosive.',
+    description: 'Multi-rocket launcher explosive. Requires Rocketeer Driver to craft (added in 1.17.0).',
     location: 'Security Lockers, Harvester Events',
-    soloNote: 'A-Tier for ARC hunting. Expensive to run.'
+  },
+  {
+    id: 'deadline',
+    name: 'Deadline Mine',
+    workbench: 'explosives-station',
+    requiredLevel: 3,
+    type: 'Explosive',
+    rarity: 'Epic',
+    priority: 'High Value',
+    description: 'Timed mine with massive 1,000 damage in a 10m radius. Requires Comet Igniter to craft. Added in Shrouded Sky 1.17.0.',
+    location: 'Industrial Containers, Apollo trader, garages and industrial underpasses',
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -901,7 +851,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Crafted from Metal Parts.',
     location: 'Refiner craft',
-    soloNote: 'Always keep crafting these for pistol/SMG repairs.'
   },
   {
     id: 'medium-gun-parts',
@@ -913,7 +862,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Crafted from Metal Parts + ARC Powercell.',
     location: 'Refiner craft, Bombardier/Bastion enemies',
-    soloNote: 'Critical for AR repairs.'
   },
   {
     id: 'heavy-gun-parts',
@@ -925,7 +873,6 @@ export const blueprints: Blueprint[] = [
     priority: 'High Value',
     description: 'Crafted from advanced materials.',
     location: 'Refiner craft, Rocketeer enemies',
-    soloNote: 'Needed for sniper/LMG repairs.'
   },
   {
     id: 'complex-gun-parts',
@@ -937,7 +884,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Required for legendary weapons.',
     location: 'Refiner craft from advanced ARC materials',
-    soloNote: 'Bottleneck for endgame weapons.'
   },
   {
     id: 'mechanical-components',
@@ -949,7 +895,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Crafted from 5 Metal Parts + ARC Powercell.',
     location: 'Refiner craft',
-    soloNote: 'Bottleneck resource for all gun upgrades.'
   },
   {
     id: 'electrical-components',
@@ -961,7 +906,6 @@ export const blueprints: Blueprint[] = [
     priority: 'Essential',
     description: 'Required for gear and utility crafting.',
     location: 'Refiner craft, recycle electronics',
-    soloNote: 'Critical for shield and augment crafting.'
   }
 ];
 

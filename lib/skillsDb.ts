@@ -372,7 +372,7 @@ export const skillBranches: SkillBranch[] = [
   }
 ];
 
-export const soloStealthBuildOrder = [
+export const recommendedBuildOrder = [
   { skillId: 'marathon-runner', points: 5, reason: 'Core mobility - escape danger and traverse large maps like Stella Montis' },
   { skillId: 'youthful-lungs', points: 5, reason: 'More stamina compounds with Marathon Runner for maximum uptime' },
   { skillId: 'looters-instincts', points: 5, reason: 'Less time looting = less time exposed to other players' },

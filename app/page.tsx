@@ -4,69 +4,60 @@ import { useState, useMemo } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
-import { skillBranches, soloStealthBuildOrder } from '@/lib/skillsDb';
+import { skillBranches, recommendedBuildOrder } from '@/lib/skillsDb';
 import { blueprints } from '@/lib/blueprintsDb';
 
-type Tab = 'loot' | 'skills' | 'blueprints';
+type Tab = 'loot' | 'blueprints' | 'skills';
 
 const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
-  KEEP: { border: 'border-green-500', text: 'text-green-500', bg: 'bg-green-500/20', icon: CheckCircle },
-  SELL: { border: 'border-red-500', text: 'text-red-500', bg: 'bg-red-500/20', icon: DollarSign },
-  RECYCLE: { border: 'border-blue-500', text: 'text-blue-500', bg: 'bg-blue-500/20', icon: Recycle },
-  USE: { border: 'border-amber-500', text: 'text-amber-400', bg: 'bg-amber-500/20', icon: Flame }
+  KEEP:    { border: 'border-l-green-500',  text: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle },
+  SELL:    { border: 'border-l-red-500',    text: 'text-red-400',    bg: 'bg-red-500/10',    icon: DollarSign },
+  RECYCLE: { border: 'border-l-blue-500',   text: 'text-blue-400',   bg: 'bg-blue-500/10',   icon: Recycle },
+  USE:     { border: 'border-l-amber-500',  text: 'text-amber-400',  bg: 'bg-amber-500/10',  icon: Flame }
 };
 
 const rarityColors: Record<Rarity, string> = {
-  Common: 'text-zinc-400',
-  Uncommon: 'text-green-400',
-  Rare: 'text-blue-400',
-  Epic: 'text-purple-400',
+  Common:    'text-zinc-400',
+  Uncommon:  'text-green-400',
+  Rare:      'text-blue-400',
+  Epic:      'text-purple-400',
   Legendary: 'text-orange-400'
 };
 
 const locationTagColors: Record<LocationTag, string> = {
-  ARC: 'bg-red-500/20 text-red-400',
-  Industrial: 'bg-amber-500/20 text-amber-400',
-  Residential: 'bg-blue-500/20 text-blue-400',
-  Commercial: 'bg-green-500/20 text-green-400',
-  Nature: 'bg-emerald-500/20 text-emerald-400',
-  Medical: 'bg-pink-500/20 text-pink-400',
-  Military: 'bg-slate-500/20 text-slate-400',
-  Topside: 'bg-orange-500/20 text-orange-400',
-  Crafting: 'bg-indigo-500/20 text-indigo-400',
-  Various: 'bg-zinc-500/20 text-zinc-400'
+  ARC:         'bg-red-500/15 text-red-400',
+  Industrial:  'bg-amber-500/15 text-amber-400',
+  Residential: 'bg-blue-500/15 text-blue-400',
+  Commercial:  'bg-green-500/15 text-green-400',
+  Nature:      'bg-emerald-500/15 text-emerald-400',
+  Medical:     'bg-pink-500/15 text-pink-400',
+  Military:    'bg-slate-500/15 text-slate-300',
+  Topside:     'bg-orange-500/15 text-orange-400',
+  Crafting:    'bg-indigo-500/15 text-indigo-400',
+  Various:     'bg-zinc-500/15 text-zinc-400'
 };
 
 const priorityColors: Record<string, string> = {
-  Critical: 'text-red-400 bg-red-500/20',
-  High: 'text-amber-400 bg-amber-500/20',
-  Medium: 'text-blue-400 bg-blue-500/20',
-  Optional: 'text-zinc-400 bg-zinc-500/20',
-  Essential: 'text-red-400 bg-red-500/20',
-  'High Value': 'text-amber-400 bg-amber-500/20',
-  Situational: 'text-blue-400 bg-blue-500/20',
-  'Low Priority': 'text-zinc-400 bg-zinc-500/20'
+  Essential:      'text-yellow-400 bg-yellow-500/10 border border-yellow-500/30',
+  'High Value':   'text-amber-400 bg-amber-500/10',
+  Situational:    'text-blue-400 bg-blue-500/10',
+  'Low Priority': 'text-zinc-500 bg-zinc-500/10'
 };
 
-const LAST_UPDATE = 'February 13, 2026';
+const LAST_UPDATE = 'February 26, 2026';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('loot');
 
-  // Loot tab state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<Item['status'] | 'ALL'>('ALL');
   const [rarityFilter, setRarityFilter] = useState<Rarity | 'ALL'>('ALL');
   const [locationFilter, setLocationFilter] = useState<LocationTag | 'ALL'>('ALL');
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
 
-  // Skills tab state
   const [expandedBranch, setExpandedBranch] = useState<string | null>('mobility');
-
-  // Blueprints tab state
   const [blueprintSearch, setBlueprintSearch] = useState('');
 
-  // Filtered loot
   const filteredLoot = useMemo(() => {
     let items = lootDb;
     items = searchItems(items, searchTerm);
@@ -76,7 +67,6 @@ export default function Home() {
     return items;
   }, [searchTerm, statusFilter, rarityFilter, locationFilter]);
 
-  // Filtered blueprints
   const filteredBlueprints = useMemo(() => {
     if (!blueprintSearch.trim()) return blueprints;
     const query = blueprintSearch.toLowerCase();
@@ -87,61 +77,64 @@ export default function Home() {
     );
   }, [blueprintSearch]);
 
-
-  // Calculate total recommended skill points
-  const totalRecommendedPoints = useMemo(() => {
-    return skillBranches.reduce((total, branch) =>
-      total + branch.skills.reduce((sum, skill) => sum + skill.recommendedPoints, 0), 0
-    );
-  }, []);
-
   const skippableSkills = useMemo(() => {
     return skillBranches.flatMap(branch =>
       branch.skills
         .filter(skill => skill.recommendedPoints === 0)
-        .map(skill => ({
-          id: skill.id,
-          name: skill.name,
-          description: skill.description,
-          branch: branch.name
-        }))
+        .map(skill => ({ id: skill.id, name: skill.name, description: skill.description, branch: branch.name }))
     );
   }, []);
 
-
   const tabs = [
-    { id: 'loot' as Tab, label: 'Loot Database', icon: Package },
-    { id: 'skills' as Tab, label: 'Skills', icon: Target },
-    { id: 'blueprints' as Tab, label: 'Blueprints', icon: BookOpen }
+    { id: 'loot'       as Tab, label: 'Loot Database', icon: Package },
+    { id: 'blueprints' as Tab, label: 'Blueprints',    icon: BookOpen },
+    { id: 'skills'     as Tab, label: 'Skills',        icon: Target }
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between mb-3">
-            <div>
-              <h1 className="text-xl font-bold text-yellow-500">ARC Raiders Companion</h1>
-              <div className="flex items-center gap-3 mt-1">
-                <p className="text-xs text-zinc-400 uppercase tracking-wide">Last update: {LAST_UPDATE}</p>
-                <span className="text-[10px] bg-yellow-500/10 text-yellow-500 px-2 py-0.5 rounded border border-yellow-500/20 font-bold uppercase">Escalation Season Roadmap</span>
+    <div className="min-h-screen bg-[#0b0b0b] text-[#e2e2e2]">
+
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-20 bg-[#0b0b0b]/97 backdrop-blur-sm border-b border-[#1f1f1f]">
+        <div className="max-w-7xl mx-auto px-4 pt-3 pb-0">
+
+          <div className="flex items-end justify-between mb-3">
+            <div className="flex items-center gap-3">
+              {/* Brand stripes – echoes the diagonal colour bars in the artwork */}
+              <div className="flex gap-[3px] h-8 items-stretch self-center">
+                <div className="w-[3px] bg-yellow-400  [clip-path:polygon(15%_0%,100%_0%,85%_100%,0%_100%)]" />
+                <div className="w-[3px] bg-yellow-400/50 [clip-path:polygon(15%_0%,100%_0%,85%_100%,0%_100%)]" />
+                <div className="w-[3px] bg-yellow-400/20 [clip-path:polygon(15%_0%,100%_0%,85%_100%,0%_100%)]" />
+              </div>
+              <div>
+                <h1 className="font-display font-bold uppercase tracking-widest leading-none">
+                  <span className="text-yellow-400 text-xl">ARC</span>
+                  <span className="text-white text-xl"> RAIDERS</span>
+                  <span className="text-zinc-500 text-sm font-normal tracking-wider hidden sm:inline ml-2">// COMPANION</span>
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-[10px] text-zinc-600 uppercase tracking-widest">Updated {LAST_UPDATE}</p>
+                  <span className="text-[9px] bg-yellow-400/10 text-yellow-400 px-1.5 py-0.5 border border-yellow-400/20 font-bold uppercase tracking-wider">
+                    Shrouded Sky 1.17.0
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+
           {/* Tabs */}
-          <nav className="flex gap-1 overflow-x-auto">
+          <nav className="flex gap-0.5 overflow-x-auto">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-zinc-800 text-yellow-500 border-b-2 border-yellow-500'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                    ? 'bg-yellow-400 text-black'
+                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
                 }`}
               >
-                <tab.icon size={16} />
+                <tab.icon size={13} />
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
@@ -149,30 +142,39 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
-        {/* LOOT DATABASE TAB */}
+      <main className="max-w-7xl mx-auto px-4 py-5 pb-24 md:pb-8">
+
+        {/* ── LOOT DATABASE ── */}
         {activeTab === 'loot' && (
           <div>
             {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-5">
               <div className="lg:col-span-2 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={15} />
                 <input
                   type="text"
                   placeholder="Search items..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-[#141414] border border-[#272727] text-sm focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-600 uppercase tracking-wide"
                 />
               </div>
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as typeof statusFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-xs text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+              >
                 <option value="ALL">All Status</option>
                 <option value="KEEP">Keep</option>
                 <option value="SELL">Sell</option>
                 <option value="RECYCLE">Recycle</option>
-                <option value="USE">Use/Consume</option>
+                <option value="USE">Use / Consume</option>
               </select>
-              <select value={rarityFilter} onChange={e => setRarityFilter(e.target.value as typeof rarityFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
+              <select
+                value={rarityFilter}
+                onChange={e => setRarityFilter(e.target.value as typeof rarityFilter)}
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-xs text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+              >
                 <option value="ALL">All Rarity</option>
                 <option value="Common">Common</option>
                 <option value="Uncommon">Uncommon</option>
@@ -180,7 +182,11 @@ export default function Home() {
                 <option value="Epic">Epic</option>
                 <option value="Legendary">Legendary</option>
               </select>
-              <select value={locationFilter} onChange={e => setLocationFilter(e.target.value as typeof locationFilter)} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg">
+              <select
+                value={locationFilter}
+                onChange={e => setLocationFilter(e.target.value as typeof locationFilter)}
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-xs text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+              >
                 <option value="ALL">All Locations</option>
                 <option value="ARC">ARC Enemies</option>
                 <option value="Industrial">Industrial</option>
@@ -195,10 +201,9 @@ export default function Home() {
               </select>
             </div>
 
-            <p className="text-zinc-500 mb-4">{filteredLoot.length} items found</p>
+            <p className="text-[10px] text-zinc-600 uppercase tracking-widest mb-4">{filteredLoot.length} items</p>
 
-            {/* Items Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredLoot.map((item, i) => {
                 const style = statusStyles[item.status];
                 const Icon = style.icon;
@@ -207,43 +212,44 @@ export default function Home() {
                 const bestLocations = getBestMapLocations(item);
                 const isExpanded = expandedLootCard === item.name;
                 return (
-                  <div key={i} className={`bg-zinc-800 rounded-lg p-4 border-l-4 ${style.border}`}>
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className={`font-bold ${rarityColors[rarity]}`}>{item.name}</h3>
-                      <Icon size={18} className={style.text} />
-                    </div>
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      <span className={`text-xs px-2 py-0.5 rounded ${style.bg} ${style.text}`}>{item.status}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${locationTagColors[locationTag]}`}>{locationTag}</span>
-                    </div>
-                    <p className="text-sm text-zinc-400 mb-2">{item.reason}</p>
-                    <p className="text-xs text-zinc-500">{item.location}</p>
-                    {bestLocations.length > 0 && (
-                      <div className="mt-3 border-t border-zinc-700 pt-3">
-                        <button
-                          onClick={() => setExpandedLootCard(prev => (prev === item.name ? null : item.name))}
-                          className="w-full flex items-center justify-between text-xs font-semibold text-yellow-400"
-                        >
-                          <span className="flex items-center gap-1">
-                            <MapPin size={14} /> Best spots by map
-                          </span>
-                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                        </button>
-                        {isExpanded && (
-                          <div className="mt-2 space-y-2">
-                            {bestLocations.map((loc, idx) => (
-                              <div key={`${loc.map}-${idx}`} className="bg-zinc-900/40 rounded-lg p-2 border border-zinc-700">
-                                <div className="flex items-center justify-between text-xs">
-                                  <span className="font-semibold text-white">{loc.map}</span>
-                                  <span className="text-amber-400">{loc.hotspot}</span>
-                                </div>
-                                <p className="text-xs text-zinc-400 mt-1">{loc.tip}</p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                  <div key={i} className={`bg-[#141414] border-t border-r border-b border-[#222] border-l-2 ${style.border}`}>
+                    <div className="p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className={`font-bold text-sm leading-tight ${rarityColors[rarity]}`}>{item.name}</h3>
+                        <Icon size={13} className={`${style.text} flex-shrink-0 mt-0.5 ml-1`} />
                       </div>
-                    )}
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        <span className={`text-[9px] px-1.5 py-0.5 font-bold uppercase tracking-widest ${style.bg} ${style.text}`}>{item.status}</span>
+                        <span className={`text-[9px] px-1.5 py-0.5 uppercase tracking-wide ${locationTagColors[locationTag]}`}>{locationTag}</span>
+                      </div>
+                      <p className="text-xs text-zinc-400 mb-1.5 leading-relaxed">{item.reason}</p>
+                      <p className="text-[10px] text-zinc-600 leading-relaxed">{item.location}</p>
+
+                      {bestLocations.length > 0 && (
+                        <div className="mt-3 border-t border-[#1f1f1f] pt-2">
+                          <button
+                            onClick={() => setExpandedLootCard(prev => prev === item.name ? null : item.name)}
+                            className="w-full flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-yellow-400/70 hover:text-yellow-400 transition-colors"
+                          >
+                            <span className="flex items-center gap-1"><MapPin size={10} /> Best spots</span>
+                            {isExpanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                          </button>
+                          {isExpanded && (
+                            <div className="mt-2 space-y-1.5">
+                              {bestLocations.map((loc, idx) => (
+                                <div key={`${loc.map}-${idx}`} className="bg-[#1a1a1a] p-2 border border-[#272727]">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-300">{loc.map}</span>
+                                    <span className="text-[10px] text-yellow-500/60 text-right">{loc.hotspot}</span>
+                                  </div>
+                                  <p className="text-[10px] text-zinc-600 mt-1">{loc.tip}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -251,33 +257,78 @@ export default function Home() {
           </div>
         )}
 
-        {/* SKILLS TAB */}
+        {/* ── BLUEPRINTS ── */}
+        {activeTab === 'blueprints' && (
+          <div className="space-y-5">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={15} />
+              <input
+                type="text"
+                placeholder="Search blueprints..."
+                value={blueprintSearch}
+                onChange={e => setBlueprintSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-[#141414] border border-[#272727] text-sm focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-600 uppercase tracking-wide"
+              />
+            </div>
+
+            <p className="text-[10px] text-zinc-600 uppercase tracking-widest">
+              {filteredBlueprints.length} blueprint{filteredBlueprints.length === 1 ? '' : 's'}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+              {filteredBlueprints.map(bp => (
+                <div key={bp.id} className="bg-[#141414] border border-[#222] hover:border-yellow-400/25 transition-colors p-3">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-bold text-sm text-white leading-tight">{bp.name}</h3>
+                    <span className="text-[9px] px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-500 uppercase tracking-wider whitespace-nowrap flex-shrink-0">
+                      {bp.workbench.replace(/-/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    <span className="text-[9px] px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-500 uppercase tracking-wide">{bp.type}</span>
+                    <span className={`text-[9px] px-1.5 py-0.5 uppercase tracking-wide ${priorityColors[bp.priority]}`}>{bp.priority}</span>
+                    <span className={`text-[9px] px-1.5 py-0.5 bg-[#1d1d1d] uppercase tracking-wide ${rarityColors[bp.rarity]}`}>{bp.rarity}</span>
+                  </div>
+                  <p className="text-[9px] text-zinc-600 uppercase tracking-widest mb-1.5">Level {bp.requiredLevel}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed">{bp.description}</p>
+                  {bp.location && (
+                    <div className="mt-2 flex items-start gap-1">
+                      <MapPin size={10} className="text-yellow-500/50 mt-0.5 flex-shrink-0" />
+                      <p className="text-[10px] text-yellow-500/50 leading-relaxed">{bp.location}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── SKILLS ── */}
         {activeTab === 'skills' && (
-          <div className="space-y-6">
-            <div className="bg-zinc-800 rounded-lg p-4 border border-yellow-500/50">
-              <h2 className="text-lg font-bold text-yellow-500 mb-2">Recommended Skill Progression</h2>
-              <p className="text-sm text-zinc-400 mb-4">
-                Follow this order when spending the {totalRecommendedPoints} recommended points. It covers every critical mobility,
-                survival, and combat perk for late-game raids.
-              </p>
-              <div className="space-y-2">
-                {soloStealthBuildOrder.map((step, i) => {
+          <div className="space-y-4">
+
+            {/* Top 10 */}
+            <div className="bg-[#141414] border border-[#222] border-l-2 border-l-yellow-400">
+              <div className="px-4 pt-4 pb-3 border-b border-[#1f1f1f]">
+                <h2 className="font-display font-bold uppercase tracking-widest text-yellow-400 text-sm">Top 10 Skills to Prioritize</h2>
+                <p className="text-xs text-zinc-600 mt-1">Spend your first points here — most impactful mobility, survival, and looting perks.</p>
+              </div>
+              <div className="p-3 space-y-1.5">
+                {recommendedBuildOrder.slice(0, 10).map((step, i) => {
                   const branch = skillBranches.find(b => b.skills.some(s => s.id === step.skillId));
                   const skill = branch?.skills.find(s => s.id === step.skillId);
-                  const cumulativePoints = soloStealthBuildOrder.slice(0, i + 1).reduce((sum, s) => sum + s.points, 0);
                   return (
-                    <div key={step.skillId} className="flex items-start gap-3 p-3 rounded-lg border border-zinc-700 bg-zinc-900/40">
-                      <span className="w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold bg-yellow-500 text-black">
+                    <div key={step.skillId} className="flex items-start gap-3 p-2.5 bg-[#1a1a1a] border border-[#252525]">
+                      <span className="w-5 h-5 flex items-center justify-center text-[10px] font-bold bg-yellow-400 text-black flex-shrink-0 mt-0.5">
                         {i + 1}
                       </span>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium text-white">{skill?.name}</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">{step.points} pts</span>
-                          <span className="text-xs text-zinc-500">{branch?.name}</span>
-                          <span className="text-xs text-yellow-400 font-semibold">Total {cumulativePoints} pts</span>
+                          <span className="font-bold text-sm text-white">{skill?.name}</span>
+                          <span className="text-[9px] px-1.5 py-0.5 bg-[#252525] text-zinc-400 uppercase tracking-wide">{step.points} pts</span>
+                          <span className="text-[9px] text-zinc-600 uppercase tracking-wide">{branch?.name}</span>
                         </div>
-                        <p className="text-xs text-zinc-400 mt-0.5">{step.reason}</p>
+                        <p className="text-[11px] text-zinc-500 mt-0.5 leading-snug">{step.reason}</p>
                       </div>
                     </div>
                   );
@@ -285,64 +336,72 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Skills to skip */}
             {skippableSkills.length > 0 && (
-              <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-                <h3 className="text-lg font-bold text-white mb-2">Skills You Can Skip</h3>
-                <p className="text-sm text-zinc-400 mb-4">
-                  These unlocks have a negligible payoff—avoid investing points here until the rest of your kit is finished.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-[#141414] border border-[#222]">
+                <div className="px-4 pt-4 pb-3 border-b border-[#1f1f1f]">
+                  <h3 className="font-display font-bold uppercase tracking-widest text-zinc-500 text-sm">Skills to Skip</h3>
+                  <p className="text-xs text-zinc-600 mt-1">Negligible payoff — invest here only after your core kit is done.</p>
+                </div>
+                <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {skippableSkills.map(skill => (
-                    <div key={skill.id} className="p-3 rounded-lg border border-zinc-700 bg-zinc-900/40">
-                      <p className="font-medium text-white">{skill.name}</p>
-                      <p className="text-xs text-zinc-500">{skill.branch}</p>
-                      <p className="text-xs text-zinc-400 mt-1">{skill.description}</p>
+                    <div key={skill.id} className="p-2.5 bg-[#1a1a1a] border border-[#252525]">
+                      <p className="font-bold text-sm text-zinc-400">{skill.name}</p>
+                      <p className="text-[9px] text-zinc-600 uppercase tracking-wide mt-0.5">{skill.branch}</p>
+                      <p className="text-xs text-zinc-600 mt-1 leading-snug">{skill.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Skill Branches */}
-            <div className="space-y-4">
+            {/* All skill branches */}
+            <div className="space-y-1.5">
               {skillBranches.map(branch => {
                 const branchPoints = branch.skills.reduce((sum, s) => sum + s.recommendedPoints, 0);
+                const isOpen = expandedBranch === branch.id;
                 return (
-                  <div key={branch.id} className="bg-zinc-800 rounded-lg border border-zinc-700 overflow-hidden">
+                  <div key={branch.id} className="bg-[#141414] border border-[#222] overflow-hidden">
                     <button
-                      onClick={() => setExpandedBranch(expandedBranch === branch.id ? null : branch.id)}
-                      className="w-full flex items-center justify-between p-4 hover:bg-zinc-700/50"
+                      onClick={() => setExpandedBranch(isOpen ? null : branch.id)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#191919] transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className={`w-3 h-3 rounded-full bg-${branch.color}-500`} />
-                        <h3 className="font-bold text-lg">{branch.name}</h3>
-                        <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">Priority #{branch.priority}</span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400">{branchPoints} pts recommended</span>
+                        <span className={`w-2 h-2 bg-${branch.color}-500 flex-shrink-0`} />
+                        <span className="font-bold text-sm uppercase tracking-wide">{branch.name}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-600 uppercase tracking-wide hidden sm:inline">
+                          Priority #{branch.priority}
+                        </span>
+                        <span className="text-[10px] text-yellow-400/60 uppercase tracking-wide">{branchPoints} pts</span>
                       </div>
-                      {expandedBranch === branch.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      {isOpen
+                        ? <ChevronUp size={15} className="text-zinc-600 flex-shrink-0" />
+                        : <ChevronDown size={15} className="text-zinc-600 flex-shrink-0" />}
                     </button>
 
-                    {expandedBranch === branch.id && (
-                      <div className="px-4 pb-4 space-y-2">
-                        <p className="text-sm text-zinc-500 mb-3">{branch.description}</p>
-                        {branch.skills.map(skill => (
-                          <div key={skill.id} className="flex items-start gap-3 p-3 bg-zinc-700/50 rounded-lg">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <span className="font-medium">{skill.name}</span>
-                                <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[skill.priority]}`}>{skill.priority}</span>
-                                {skill.prerequisitePoints && (
-                                  <span className="text-xs text-zinc-500">Requires {skill.prerequisitePoints} pts in tree</span>
-                                )}
+                    {isOpen && (
+                      <div className="border-t border-[#1f1f1f]">
+                        <p className="text-xs text-zinc-600 px-4 py-2.5">{branch.description}</p>
+                        <div className="px-3 pb-3 space-y-1.5">
+                          {branch.skills.map(skill => (
+                            <div key={skill.id} className="flex items-start gap-3 p-2.5 bg-[#1a1a1a] border border-[#252525]">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <span className="font-bold text-sm text-zinc-200">{skill.name}</span>
+                                  <span className={`text-[9px] px-1.5 py-0.5 uppercase tracking-wider ${priorityColors[skill.priority]}`}>{skill.priority}</span>
+                                  {skill.prerequisitePoints && (
+                                    <span className="text-[9px] text-zinc-600 uppercase tracking-wide">Req. {skill.prerequisitePoints} pts</span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-zinc-500 leading-relaxed">{skill.description}</p>
+                                <p className="text-[10px] text-green-400/70 mt-1">{skill.benefit}</p>
                               </div>
-                              <p className="text-sm text-zinc-400">{skill.description}</p>
-                              <p className="text-xs text-green-400 mt-1">{skill.benefit}</p>
+                              <span className="text-yellow-400 font-bold text-sm font-mono flex-shrink-0">
+                                {skill.recommendedPoints}/{skill.maxPoints}
+                              </span>
                             </div>
-                            <div className="text-right">
-                              <span className="text-yellow-500 font-bold">{skill.recommendedPoints}/{skill.maxPoints}</span>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -351,66 +410,20 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {/* BLUEPRINTS TAB */}
-        {activeTab === 'blueprints' && (
-          <div className="space-y-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-              <input
-                type="text"
-                placeholder="Search blueprints by name, description, or location..."
-                value={blueprintSearch}
-                onChange={(e) => setBlueprintSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              />
-            </div>
-
-            <p className="text-sm text-zinc-500">
-              {filteredBlueprints.length} blueprint{filteredBlueprints.length === 1 ? '' : 's'} match your search.
-            </p>
-
-            {/* Blueprint Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {filteredBlueprints.map(bp => (
-                <div key={bp.id} className="bg-zinc-800 rounded-lg p-4 border border-zinc-700 hover:border-yellow-500/40 transition">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium text-white">{bp.name}</h3>
-                    <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-300">
-                      {bp.workbench.replace(/-/g, ' ')}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-400">{bp.type}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${priorityColors[bp.priority]}`}>{bp.priority}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${rarityColors[bp.rarity]} bg-zinc-700`}>{bp.rarity}</span>
-                  </div>
-                  <p className="text-xs text-zinc-500 mb-1">Requires level {bp.requiredLevel}</p>
-                  <p className="text-sm text-zinc-400">{bp.description}</p>
-                  {bp.location && (
-                    <div className="mt-2 flex items-start gap-1">
-                      <MapPin size={12} className="text-amber-400 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-amber-400">{bp.location}</p>
-                    </div>
-                  )}
-                  {bp.soloNote && <p className="text-xs text-yellow-500/80 mt-1">{bp.soloNote}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </main>
-      <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-zinc-950/95 border-t border-zinc-800 px-2 py-2 flex items-center justify-around z-30 backdrop-blur">
+
+      {/* ── Mobile bottom nav ── */}
+      <nav className="fixed md:hidden bottom-0 left-0 right-0 bg-[#0b0b0b]/98 border-t border-[#1f1f1f] px-2 py-2 flex items-center justify-around z-30">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex flex-col items-center text-[10px] font-medium px-2 py-1 rounded-lg transition ${
-              activeTab === tab.id ? 'text-yellow-400' : 'text-zinc-500'
+            className={`flex flex-col items-center gap-1 px-3 py-1 transition-colors ${
+              activeTab === tab.id ? 'text-yellow-400' : 'text-zinc-600'
             }`}
           >
-            <tab.icon size={18} />
-            <span className="mt-1">{tab.label.split(' ')[0]}</span>
+            <tab.icon size={17} />
+            <span className="text-[9px] font-bold uppercase tracking-widest">{tab.label.split(' ')[0]}</span>
           </button>
         ))}
       </nav>

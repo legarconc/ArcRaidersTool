@@ -1,10 +1,10 @@
 # Arc Raiders Companion Tool
 
-A browser-based companion for **Arc Raiders** solo players. Features a comprehensive loot database, focused skill guidance, and blueprint catalog with clear farming locations.
+A browser-based companion for **Arc Raiders** players. Features a comprehensive loot database, blueprint catalog, and skill guidance — designed for both solo and squad play.
 
 **Live App:** https://legarconc.github.io/ArcRaidersTool/
 
-*Last updated: February 13, 2026 (Escalation Season: "Shrouded Sky" Update)*
+*Last updated: February 26, 2026 — Shrouded Sky 1.17.0*
 
 ## Features
 
@@ -14,40 +14,35 @@ A browser-based companion for **Arc Raiders** solo players. Features a comprehen
 - Location tags: ARC, Industrial, Residential, Commercial, Nature, Medical, Military, Topside, Crafting
 - Expandable map-specific farming hotspots with tips
 - Filter by status, rarity, location type, and search
-- **New:** Includes specialized counters for Airborne ARC threats
-
-### Skills Guide (3 trees, 75 points)
-- **Mobility** (Priority #1) — Stamina management, movement speed, parkour
-- **Survival** (Priority #2) — Looting, crafting, carry capacity
-- **Conditioning** (Priority #3) — Weight management, recovery, noise reduction
-
-**Key features:**
-- Recommended Skill Progression — Step-by-step solo path listing total point investment per pick
-- Skip List — Highlights low-impact perks you can safely ignore until endgame
-- Priority ratings (Critical, High, Medium, Optional) for each skill
-- Prerequisite requirements for every major unlock
-- **Note:** March 2026 "Second Expedition" catch-up system details included
 
 ### Blueprints Catalog (75+ blueprints)
 - All blueprints with **drop locations** and farming tips
 - Categories: Weapons, Attachments, Shields, Augments, Consumables, Tools, Explosives, Components
 - Priority ratings: Essential, High Value, Situational, Low Priority
-- Lightweight search for names, descriptions, or locations — no ownership tracking UI
+- Search by name, description, or location
+- Up to date with 1.17.0 additions (Deadline Mine, Wolfpack recipe change)
 
-**Notable blueprints with guaranteed sources:**
-- **Kettle AR** — Stealth focused S-Tier (capped at 450 RPM in 1.11.0)
-- **Seeker Grenade** — Essential airborne counter (Shared Watch event reward)
-- **Survivor Mk.3 Safekeeper** — High Loot Zones (Major Map Conditions)
-- Hullcracker — Quest: The Major's Footlocker (Tian Wen)
-- Burletta — Quest: Industrial Espionage (Tian Wen)
-- Lure Grenade — Quest: Greasing Her Palms (Celeste)
-- Equalizer/Jupiter — Harvester Events
+### Skills Guide
+- **Top 10 priority skills** highlighted at the top — spend your first points here
+- All three skill trees fully listed with point recommendations
+- Skip list for low-impact perks
+- Prerequisite requirements for every major unlock
+
+## Shrouded Sky 1.17.0 (February 24, 2026)
+
+- **New enemies:** Firefly (flying, flame attacks) and Comet (rolling explosive sphere)
+- **New blueprint:** Deadline Mine — Epic timed explosive, crafted with Comet Igniter
+- **Wolfpack** recipe updated: now requires Rocketeer Driver
+- **Weapon balance:** Stitcher, Kettle, Venator nerfed; Aphelion and Jupiter buffed
+- **New items:** Firefly Burner, Comet Igniter, Anemometer Backpack Charm
+- **Hurricane** map condition and Dam Battlegrounds Controlled Access Zone
 
 ## Escalation Season Roadmap (2026)
-- **January:** "Headwinds" - Solo vs Squads, Bird City Map Condition.
-- **February:** "Shrouded Sky" - Airborne ARC threats, Shared Watch Event.
-- **March:** "Flashpoint" - New ARC enemy, Second Expedition (Skill Point Catch-up).
-- **April:** "Riven Tides" - Brand-new map.
+
+- **January:** "Headwinds" — Bird City Map Condition, Looting Mk.3 Safekeeper
+- **February:** "Shrouded Sky" — Hurricane, Firefly & Comet enemies, Deadline Mine
+- **March:** "Flashpoint" — New ARC enemy, Second Expedition skill catch-up
+- **April:** "Riven Tides" — Brand-new map
 
 ## Getting Started
 
@@ -60,7 +55,6 @@ Browse to [http://localhost:3000](http://localhost:3000).
 
 ## Data Sources
 
-Item and blueprint data sourced from:
 - [ARC Raiders Wiki](https://arcraiders.wiki/)
 - [Arc Raiders Cheat Sheet](https://arcraiderscheatsheet.org/)
 - [GAM3S.GG Guides](https://gam3s.gg/arc-raiders/)
@@ -72,6 +66,7 @@ Item and blueprint data sourced from:
 - [React 19](https://react.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
 - [Lucide Icons](https://lucide.dev/)
+- [Rajdhani](https://fonts.google.com/specimen/Rajdhani) (Google Fonts)
 - [TypeScript 5](https://www.typescriptlang.org/)
 
 ## Development
