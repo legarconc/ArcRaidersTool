@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin, Map } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin, Map, Briefcase } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { skillBranches, recommendedBuildOrder } from '@/lib/skillsDb';
 import { blueprints } from '@/lib/blueprintsDb';
+import { projects } from '@/lib/projectsDb';
 
-type Tab = 'loot' | 'blueprints' | 'skills' | 'maps';
+type Tab = 'loot' | 'blueprints' | 'skills' | 'maps' | 'projects';
 
 const MAPS = [
   { id: 'bluegate',     label: 'Blue Gate',         file: 'BlueGateMap.png'       },
@@ -69,6 +70,8 @@ export default function Home() {
   const [expandedLootCard, setExpandedLootCard] = useState<string | null>(null);
 
   const [expandedBranch, setExpandedBranch] = useState<string | null>('mobility');
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [expandedStage, setExpandedStage] = useState<string | null>(null);
   const [blueprintSearch, setBlueprintSearch] = useState('');
 
   const filteredLoot = useMemo(() => {
@@ -102,7 +105,8 @@ export default function Home() {
     { id: 'loot'       as Tab, label: 'Loot Database', icon: Package },
     { id: 'blueprints' as Tab, label: 'Blueprints',    icon: BookOpen },
     { id: 'skills'     as Tab, label: 'Skills',        icon: Target  },
-    { id: 'maps'       as Tab, label: 'Maps',          icon: Map     },
+    { id: 'maps'       as Tab, label: 'Maps',          icon: Map       },
+    { id: 'projects'   as Tab, label: 'Projects',      icon: Briefcase },
   ];
 
   return (
@@ -424,6 +428,130 @@ export default function Home() {
             </div>
           </div>
         )}
+        {/* ── PROJECTS ── */}
+        {activeTab === 'projects' && (
+          <div className="space-y-2">
+            {projects.map(project => {
+              const isOpen = expandedProject === project.id;
+              const statusStyle =
+                project.status === 'Active'    ? 'text-green-400 bg-green-500/10 border-green-500/30' :
+                project.status === 'Recurring' ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30' :
+                                                 'text-zinc-500 bg-zinc-500/10 border-zinc-500/30';
+              return (
+                <div key={project.id} className="bg-[#141414] border border-[#222] overflow-hidden">
+                  {/* Project header */}
+                  <button
+                    onClick={() => {
+                      setExpandedProject(isOpen ? null : project.id);
+                      setExpandedStage(null);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#191919] transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="font-bold text-xl uppercase tracking-wide text-white">{project.name}</span>
+                      <span className={`text-xs px-1.5 py-0.5 font-bold uppercase tracking-widest border ${statusStyle}`}>
+                        {project.status}
+                      </span>
+                      {project.dateRange && (
+                        <span className="text-sm text-zinc-500 uppercase tracking-wide">{project.dateRange}</span>
+                      )}
+                    </div>
+                    {isOpen
+                      ? <ChevronUp size={22} className="text-zinc-500 flex-shrink-0" />
+                      : <ChevronDown size={22} className="text-zinc-500 flex-shrink-0" />}
+                  </button>
+
+                  {isOpen && (
+                    <div className="border-t border-[#1f1f1f]">
+                      <p className="text-lg text-zinc-400 px-4 py-3 leading-relaxed">{project.description}</p>
+
+                      {/* Stages */}
+                      <div className="px-3 pb-3 space-y-1">
+                        {project.stages.map((stage, si) => {
+                          const stageKey = `${project.id}-${si}`;
+                          const stageOpen = expandedStage === stageKey;
+                          return (
+                            <div key={stageKey} className="bg-[#1a1a1a] border border-[#252525]">
+                              <button
+                                onClick={() => setExpandedStage(stageOpen ? null : stageKey)}
+                                className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#1f1f1f] transition-colors text-left"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="w-5 h-5 flex items-center justify-center text-xs font-bold bg-[#2a2a2a] text-zinc-400 flex-shrink-0">
+                                    {si + 1}
+                                  </span>
+                                  <span className="font-bold text-lg text-zinc-200 uppercase tracking-wide">{stage.name}</span>
+                                  {stage.note && (
+                                    <span className="text-sm text-yellow-400/60 hidden sm:inline">{stage.note}</span>
+                                  )}
+                                </div>
+                                {stageOpen
+                                  ? <ChevronUp size={16} className="text-zinc-600 flex-shrink-0" />
+                                  : <ChevronDown size={16} className="text-zinc-600 flex-shrink-0" />}
+                              </button>
+
+                              {stageOpen && (
+                                <div className="px-3 pb-3 pt-1 space-y-3">
+                                  {stage.description && (
+                                    <p className="text-base text-zinc-500 italic leading-relaxed">{stage.description}</p>
+                                  )}
+                                  {stage.note && (
+                                    <p className="text-base text-yellow-400/70 sm:hidden">{stage.note}</p>
+                                  )}
+                                  {stage.requirements.length > 0 && (
+                                    <div>
+                                      <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Required</p>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                                        {stage.requirements.map((req, ri) => (
+                                          <div key={ri} className="flex items-center justify-between gap-2 bg-[#141414] px-2.5 py-1.5 border border-[#2a2a2a]">
+                                            <span className="text-base text-zinc-300">{req.item}</span>
+                                            <span className="text-base font-bold text-zinc-400 whitespace-nowrap">{req.qty}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {stage.rewards && stage.rewards.length > 0 && (
+                                    <div>
+                                      <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-1.5">Rewards</p>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                                        {stage.rewards.map((rew, ri) => (
+                                          <div key={ri} className="flex items-center justify-between gap-2 bg-[#141414] px-2.5 py-1.5 border border-[#2a2a2a]">
+                                            <span className="text-base text-green-400/80">{rew.item}</span>
+                                            <span className="text-base font-bold text-green-500/60 whitespace-nowrap">{rew.qty}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Completion rewards */}
+                      {project.completionRewards && project.completionRewards.length > 0 && (
+                        <div className="mx-3 mb-3 p-3 bg-yellow-400/5 border border-yellow-400/15">
+                          <p className="text-xs font-bold uppercase tracking-widest text-yellow-400/70 mb-2">Completion Rewards</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {project.completionRewards.map((reward, ri) => (
+                              <span key={ri} className="text-sm px-2 py-1 bg-[#1a1a1a] border border-[#2a2a2a] text-zinc-300">
+                                {reward}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {/* ── MAPS ── */}
         {activeTab === 'maps' && (
           <div className="space-y-4">
