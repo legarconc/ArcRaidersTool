@@ -123,7 +123,7 @@ export default function Home() {
           </div>
 
           {/* Tabs */}
-          <nav className="flex gap-0.5 overflow-x-auto">
+          <nav className="hidden md:flex gap-0.5 overflow-x-auto">
             {tabs.map(tab => (
               <button
                 key={tab.id}
