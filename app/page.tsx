@@ -1,13 +1,25 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import type { LucideIcon } from 'lucide-react';
-import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import { Search, CheckCircle, DollarSign, Recycle, Flame, Package, Target, BookOpen, ChevronDown, ChevronUp, MapPin, Map } from 'lucide-react';
 import { lootDb, Item, getItemRarity, getLocationTag, Rarity, LocationTag, searchItems, filterByStatus, filterByRarity, filterByLocationTag, getBestMapLocations } from '@/lib/lootDb';
 import { skillBranches, recommendedBuildOrder } from '@/lib/skillsDb';
 import { blueprints } from '@/lib/blueprintsDb';
 
-type Tab = 'loot' | 'blueprints' | 'skills';
+type Tab = 'loot' | 'blueprints' | 'skills' | 'maps';
+
+const MAPS = [
+  { id: 'bluegate',     label: 'Blue Gate',         file: 'BlueGateMap.png'       },
+  { id: 'buriedcity',   label: 'Buried City',        file: 'BuriedCity.png'        },
+  { id: 'dam',          label: 'Dam Battlegrounds',  file: 'Dam_Battlegrounds.png' },
+  { id: 'spaceport',    label: 'Spaceport',          file: 'SpacePortMap.png'      },
+  { id: 'stellamontis', label: 'Stella Montis',      file: 'StellaMontisMap.png'   },
+] as const;
+
+type MapId = typeof MAPS[number]['id'];
 
 const statusStyles: Record<Item['status'], { border: string; text: string; bg: string; icon: LucideIcon }> = {
   KEEP:    { border: 'border-l-green-500',  text: 'text-green-400',  bg: 'bg-green-500/10',  icon: CheckCircle },
@@ -48,6 +60,7 @@ const LAST_UPDATE = 'February 26, 2026';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('loot');
+  const [activeMap, setActiveMap] = useState<MapId>('bluegate');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<Item['status'] | 'ALL'>('ALL');
@@ -88,7 +101,8 @@ export default function Home() {
   const tabs = [
     { id: 'loot'       as Tab, label: 'Loot Database', icon: Package },
     { id: 'blueprints' as Tab, label: 'Blueprints',    icon: BookOpen },
-    { id: 'skills'     as Tab, label: 'Skills',        icon: Target }
+    { id: 'skills'     as Tab, label: 'Skills',        icon: Target  },
+    { id: 'maps'       as Tab, label: 'Maps',          icon: Map     },
   ];
 
   return (
@@ -408,6 +422,80 @@ export default function Home() {
                 );
               })}
             </div>
+          </div>
+        )}
+        {/* ── MAPS ── */}
+        {activeTab === 'maps' && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="font-display font-bold uppercase tracking-widest text-yellow-400 text-lg mb-1">
+                Security Breach Locker Locations
+              </h2>
+              <p className="text-base text-zinc-500">Scroll or pinch to zoom · Drag to pan</p>
+            </div>
+
+            {/* Map selector */}
+            <div className="flex flex-wrap gap-1">
+              {MAPS.map(map => (
+                <button
+                  key={map.id}
+                  onClick={() => setActiveMap(map.id)}
+                  className={`px-3 py-1.5 text-sm font-bold uppercase tracking-widest transition-all ${
+                    activeMap === map.id
+                      ? 'bg-yellow-400 text-black'
+                      : 'bg-[#141414] border border-[#272727] text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                  }`}
+                >
+                  {map.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Map viewer */}
+            {MAPS.filter(m => m.id === activeMap).map(map => (
+              <div key={map.id} className="relative bg-[#080808] border border-[#222] overflow-hidden" style={{ height: '75vh' }}>
+                <TransformWrapper
+                  key={map.id}
+                  initialScale={1}
+                  minScale={0.2}
+                  maxScale={10}
+                  wheel={{ step: 0.05 }}
+                >
+                  {({ zoomIn, zoomOut, resetTransform }) => (
+                    <>
+                      <div className="absolute top-2 right-2 z-10 flex gap-1">
+                        <button
+                          onClick={() => zoomIn()}
+                          className="w-9 h-9 bg-[#141414]/90 border border-[#333] text-zinc-300 hover:text-white hover:border-yellow-400/40 flex items-center justify-center text-xl font-bold transition-colors"
+                        >+</button>
+                        <button
+                          onClick={() => zoomOut()}
+                          className="w-9 h-9 bg-[#141414]/90 border border-[#333] text-zinc-300 hover:text-white hover:border-yellow-400/40 flex items-center justify-center text-xl font-bold transition-colors"
+                        >−</button>
+                        <button
+                          onClick={() => resetTransform()}
+                          className="px-2.5 h-9 bg-[#141414]/90 border border-[#333] text-zinc-400 hover:text-white hover:border-yellow-400/40 text-xs font-bold uppercase tracking-widest transition-colors"
+                        >Reset</button>
+                      </div>
+                      <TransformComponent
+                        wrapperStyle={{ width: '100%', height: '100%' }}
+                        contentStyle={{ width: '100%' }}
+                      >
+                        <Image
+                          src={`/maps/${map.file}`}
+                          alt={map.label}
+                          width={0}
+                          height={0}
+                          sizes="100vw"
+                          style={{ width: '100%', height: 'auto', display: 'block' }}
+                          priority
+                        />
+                      </TransformComponent>
+                    </>
+                  )}
+                </TransformWrapper>
+              </div>
+            ))}
           </div>
         )}
       </main>

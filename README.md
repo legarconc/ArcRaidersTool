@@ -28,6 +28,11 @@ A browser-based companion for **Arc Raiders** players. Features a comprehensive 
 - Skip list for low-impact perks
 - Prerequisite requirements for every major unlock
 
+### Maps — Security Breach Locker Locations
+- Zoomable maps for all five battlegrounds: Blue Gate, Buried City, Dam Battlegrounds, Spaceport, Stella Montis
+- All locker locations requiring the **Security Breach** skill marked on each map
+- Scroll to zoom on desktop · Pinch to zoom on mobile · Drag to pan
+
 ### UI/UX & Accessibility
 - **High-Contrast Design:** Near-black palette with bright yellow accents and light grey text for maximum readability on OLED and standard displays.
 - **Large Typography:** Generous font sizes optimized for quick reference during gameplay.
@@ -72,8 +77,13 @@ Browse to [http://localhost:3000](http://localhost:3000).
 - [React 19](https://react.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
 - [Lucide Icons](https://lucide.dev/)
+- [react-zoom-pan-pinch](https://github.com/BetterTyped/react-zoom-pan-pinch)
 - [Rajdhani](https://fonts.google.com/specimen/Rajdhani) (Google Fonts)
 - [TypeScript 5](https://www.typescriptlang.org/)
+
+## Credits
+
+Security Breach locker location maps contributed by [bosjer-commits](https://github.com/bosjer-commits).
 
 ## Development
 
