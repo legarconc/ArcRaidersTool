@@ -17,7 +17,7 @@ const statusStyles: Record<Item['status'], { border: string; text: string; bg: s
 };
 
 const rarityColors: Record<Rarity, string> = {
-  Common:    'text-zinc-400',
+  Common:    'text-zinc-300',
   Uncommon:  'text-green-400',
   Rare:      'text-blue-400',
   Epic:      'text-purple-400',
@@ -31,17 +31,17 @@ const locationTagColors: Record<LocationTag, string> = {
   Commercial:  'bg-green-500/15 text-green-400',
   Nature:      'bg-emerald-500/15 text-emerald-400',
   Medical:     'bg-pink-500/15 text-pink-400',
-  Military:    'bg-slate-500/15 text-slate-300',
+  Military:    'bg-slate-500/15 text-slate-200',
   Topside:     'bg-orange-500/15 text-orange-400',
   Crafting:    'bg-indigo-500/15 text-indigo-400',
-  Various:     'bg-zinc-500/15 text-zinc-400'
+  Various:     'bg-zinc-500/15 text-zinc-300'
 };
 
 const priorityColors: Record<string, string> = {
   Essential:      'text-yellow-400 bg-yellow-500/10 border border-yellow-500/30',
   'High Value':   'text-amber-400 bg-amber-500/10',
   Situational:    'text-blue-400 bg-blue-500/10',
-  'Low Priority': 'text-zinc-500 bg-zinc-500/10'
+  'Low Priority': 'text-zinc-400 bg-zinc-500/10'
 };
 
 const LAST_UPDATE = 'February 26, 2026';
@@ -108,13 +108,13 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="font-display font-bold uppercase tracking-widest leading-none">
-                  <span className="text-yellow-400 text-2xl">ARC</span>
-                  <span className="text-white text-2xl"> RAIDERS</span>
-                  <span className="text-zinc-500 text-base font-normal tracking-wider hidden sm:inline ml-2">{"// COMPANION"}</span>
+                  <span className="text-yellow-400 text-3xl">ARC</span>
+                  <span className="text-white text-3xl"> RAIDERS</span>
+                  <span className="text-zinc-400 text-lg font-normal tracking-wider hidden sm:inline ml-2">{"// COMPANION"}</span>
                 </h1>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-xs text-zinc-600 uppercase tracking-widest">Updated {LAST_UPDATE}</p>
-                  <span className="text-[11px] bg-yellow-400/10 text-yellow-400 px-1.5 py-0.5 border border-yellow-400/20 font-bold uppercase tracking-wider">
+                  <p className="text-sm text-zinc-500 uppercase tracking-widest">Updated {LAST_UPDATE}</p>
+                  <span className="text-xs bg-yellow-400/10 text-yellow-400 px-1.5 py-0.5 border border-yellow-400/20 font-bold uppercase tracking-wider">
                     Shrouded Sky 1.17.0
                   </span>
                 </div>
@@ -128,13 +128,13 @@ export default function Home() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-base font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2.5 text-lg font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-yellow-400 text-black'
-                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                 }`}
               >
-                <tab.icon size={16} />
+                <tab.icon size={18} />
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
@@ -150,19 +150,19 @@ export default function Home() {
             {/* Filters */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-5">
               <div className="lg:col-span-2 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
                 <input
                   type="text"
                   placeholder="Search items..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-[#141414] border border-[#272727] text-base focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-600 uppercase tracking-wide"
+                  className="w-full pl-10 pr-4 py-2 bg-[#141414] border border-[#272727] text-lg focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-500 uppercase tracking-wide"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
-                className="px-3 py-2 bg-[#141414] border border-[#272727] text-sm text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-base text-zinc-300 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
               >
                 <option value="ALL">All Status</option>
                 <option value="KEEP">Keep</option>
@@ -173,7 +173,7 @@ export default function Home() {
               <select
                 value={rarityFilter}
                 onChange={e => setRarityFilter(e.target.value as typeof rarityFilter)}
-                className="px-3 py-2 bg-[#141414] border border-[#272727] text-sm text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-base text-zinc-300 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
               >
                 <option value="ALL">All Rarity</option>
                 <option value="Common">Common</option>
@@ -185,7 +185,7 @@ export default function Home() {
               <select
                 value={locationFilter}
                 onChange={e => setLocationFilter(e.target.value as typeof locationFilter)}
-                className="px-3 py-2 bg-[#141414] border border-[#272727] text-sm text-zinc-400 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
+                className="px-3 py-2 bg-[#141414] border border-[#272727] text-base text-zinc-300 focus:outline-none focus:border-yellow-400/50 uppercase tracking-widest"
               >
                 <option value="ALL">All Locations</option>
                 <option value="ARC">ARC Enemies</option>
@@ -201,7 +201,7 @@ export default function Home() {
               </select>
             </div>
 
-            <p className="text-xs text-zinc-600 uppercase tracking-widest mb-4">{filteredLoot.length} items</p>
+            <p className="text-sm text-zinc-500 uppercase tracking-widest mb-4">{filteredLoot.length} items</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredLoot.map((item, i) => {
@@ -215,34 +215,34 @@ export default function Home() {
                   <div key={i} className={`bg-[#141414] border-t border-r border-b border-[#222] border-l-2 ${style.border}`}>
                     <div className="p-3">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className={`font-bold text-lg leading-tight ${rarityColors[rarity]}`}>{item.name}</h3>
-                        <Icon size={18} className={`${style.text} flex-shrink-0 mt-0.5 ml-1`} />
+                        <h3 className={`font-bold text-xl leading-tight ${rarityColors[rarity]}`}>{item.name}</h3>
+                        <Icon size={20} className={`${style.text} flex-shrink-0 mt-0.5 ml-1`} />
                       </div>
                       <div className="flex flex-wrap gap-1 mb-2">
-                        <span className={`text-xs px-1.5 py-0.5 font-bold uppercase tracking-widest ${style.bg} ${style.text}`}>{item.status}</span>
-                        <span className={`text-xs px-1.5 py-0.5 uppercase tracking-wide ${locationTagColors[locationTag]}`}>{locationTag}</span>
+                        <span className={`text-sm px-1.5 py-0.5 font-bold uppercase tracking-widest ${style.bg} ${style.text}`}>{item.status}</span>
+                        <span className={`text-sm px-1.5 py-0.5 uppercase tracking-wide ${locationTagColors[locationTag]}`}>{locationTag}</span>
                       </div>
-                      <p className="text-base text-zinc-400 mb-1.5 leading-relaxed">{item.reason}</p>
-                      <p className="text-sm text-zinc-600 leading-relaxed">{item.location}</p>
+                      <p className="text-lg text-zinc-300 mb-1.5 leading-relaxed">{item.reason}</p>
+                      <p className="text-base text-zinc-500 leading-relaxed">{item.location}</p>
 
                       {bestLocations.length > 0 && (
                         <div className="mt-3 border-t border-[#1f1f1f] pt-2">
                           <button
                             onClick={() => setExpandedLootCard(prev => prev === item.name ? null : item.name)}
-                            className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-widest text-yellow-400/70 hover:text-yellow-400 transition-colors"
+                            className="w-full flex items-center justify-between text-sm font-bold uppercase tracking-widest text-yellow-400/70 hover:text-yellow-400 transition-colors"
                           >
-                            <span className="flex items-center gap-1"><MapPin size={12} /> Best spots</span>
-                            {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                            <span className="flex items-center gap-1"><MapPin size={14} /> Best spots</span>
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                           </button>
                           {isExpanded && (
                             <div className="mt-2 space-y-1.5">
                               {bestLocations.map((loc, idx) => (
                                 <div key={`${loc.map}-${idx}`} className="bg-[#1a1a1a] p-2 border border-[#272727]">
                                   <div className="flex items-center justify-between gap-2">
-                                    <span className="text-xs font-bold uppercase tracking-wide text-zinc-300">{loc.map}</span>
-                                    <span className="text-xs text-yellow-500/60 text-right">{loc.hotspot}</span>
+                                    <span className="text-sm font-bold uppercase tracking-wide text-zinc-200">{loc.map}</span>
+                                    <span className="text-sm text-yellow-500/60 text-right">{loc.hotspot}</span>
                                   </div>
-                                  <p className="text-xs text-zinc-600 mt-1">{loc.tip}</p>
+                                  <p className="text-sm text-zinc-500 mt-1">{loc.tip}</p>
                                 </div>
                               ))}
                             </div>
@@ -261,17 +261,17 @@ export default function Home() {
         {activeTab === 'blueprints' && (
           <div className="space-y-5">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
               <input
                 type="text"
                 placeholder="Search blueprints..."
                 value={blueprintSearch}
                 onChange={e => setBlueprintSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#141414] border border-[#272727] text-base focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-600 uppercase tracking-wide"
+                className="w-full pl-10 pr-4 py-2 bg-[#141414] border border-[#272727] text-lg focus:outline-none focus:border-yellow-400/50 transition-colors placeholder:text-zinc-500 uppercase tracking-wide"
               />
             </div>
 
-            <p className="text-xs text-zinc-600 uppercase tracking-widest">
+            <p className="text-sm text-zinc-500 uppercase tracking-widest">
               {filteredBlueprints.length} blueprint{filteredBlueprints.length === 1 ? '' : 's'}
             </p>
 
@@ -279,22 +279,22 @@ export default function Home() {
               {filteredBlueprints.map(bp => (
                 <div key={bp.id} className="bg-[#141414] border border-[#222] hover:border-yellow-400/25 transition-colors p-3">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-bold text-lg text-white leading-tight">{bp.name}</h3>
-                    <span className="text-xs px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-500 uppercase tracking-wider whitespace-nowrap flex-shrink-0">
+                    <h3 className="font-bold text-xl text-white leading-tight">{bp.name}</h3>
+                    <span className="text-sm px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-400 uppercase tracking-wider whitespace-nowrap flex-shrink-0">
                       {bp.workbench.replace(/-/g, ' ')}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1 mb-2">
-                    <span className="text-xs px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-500 uppercase tracking-wide">{bp.type}</span>
-                    <span className={`text-xs px-1.5 py-0.5 uppercase tracking-wide ${priorityColors[bp.priority]}`}>{bp.priority}</span>
-                    <span className={`text-xs px-1.5 py-0.5 bg-[#1d1d1d] uppercase tracking-wide ${rarityColors[bp.rarity]}`}>{bp.rarity}</span>
+                    <span className="text-sm px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-400 uppercase tracking-wide">{bp.type}</span>
+                    <span className={`text-sm px-1.5 py-0.5 uppercase tracking-wide ${priorityColors[bp.priority]}`}>{bp.priority}</span>
+                    <span className={`text-sm px-1.5 py-0.5 bg-[#1d1d1d] uppercase tracking-wide ${rarityColors[bp.rarity]}`}>{bp.rarity}</span>
                   </div>
-                  <p className="text-xs text-zinc-600 uppercase tracking-widest mb-1.5">Level {bp.requiredLevel}</p>
-                  <p className="text-base text-zinc-400 leading-relaxed">{bp.description}</p>
+                  <p className="text-sm text-zinc-500 uppercase tracking-widest mb-1.5">Level {bp.requiredLevel}</p>
+                  <p className="text-lg text-zinc-300 leading-relaxed">{bp.description}</p>
                   {bp.location && (
                     <div className="mt-2 flex items-start gap-1">
-                      <MapPin size={12} className="text-yellow-500/50 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-yellow-500/50 leading-relaxed">{bp.location}</p>
+                      <MapPin size={14} className="text-yellow-500/50 mt-0.5 flex-shrink-0" />
+                      <p className="text-base text-yellow-500/50 leading-relaxed">{bp.location}</p>
                     </div>
                   )}
                 </div>
@@ -310,8 +310,8 @@ export default function Home() {
             {/* Top 10 */}
             <div className="bg-[#141414] border border-[#222] border-l-2 border-l-yellow-400">
               <div className="px-4 pt-4 pb-3 border-b border-[#1f1f1f]">
-                <h2 className="font-display font-bold uppercase tracking-widest text-yellow-400 text-base">Top 10 Skills to Prioritize</h2>
-                <p className="text-sm text-zinc-600 mt-1">Spend your first points here — most impactful mobility, survival, and looting perks.</p>
+                <h2 className="font-display font-bold uppercase tracking-widest text-yellow-400 text-lg">Top 10 Skills to Prioritize</h2>
+                <p className="text-base text-zinc-500 mt-1">Spend your first points here — most impactful mobility, survival, and looting perks.</p>
               </div>
               <div className="p-3 space-y-1.5">
                 {recommendedBuildOrder.slice(0, 10).map((step, i) => {
@@ -319,16 +319,16 @@ export default function Home() {
                   const skill = branch?.skills.find(s => s.id === step.skillId);
                   return (
                     <div key={step.skillId} className="flex items-start gap-3 p-2.5 bg-[#1a1a1a] border border-[#252525]">
-                      <span className="w-5 h-5 flex items-center justify-center text-xs font-bold bg-yellow-400 text-black flex-shrink-0 mt-0.5">
+                      <span className="w-6 h-6 flex items-center justify-center text-sm font-bold bg-yellow-400 text-black flex-shrink-0 mt-0.5">
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-lg text-white">{skill?.name}</span>
-                          <span className="text-xs px-1.5 py-0.5 bg-[#252525] text-zinc-400 uppercase tracking-wide">{step.points} pts</span>
-                          <span className="text-xs text-zinc-600 uppercase tracking-wide">{branch?.name}</span>
+                          <span className="font-bold text-xl text-white">{skill?.name}</span>
+                          <span className="text-sm px-1.5 py-0.5 bg-[#252525] text-zinc-300 uppercase tracking-wide">{step.points} pts</span>
+                          <span className="text-sm text-zinc-500 uppercase tracking-wide">{branch?.name}</span>
                         </div>
-                        <p className="text-sm text-zinc-500 mt-0.5 leading-snug">{step.reason}</p>
+                        <p className="text-base text-zinc-400 mt-0.5 leading-snug">{step.reason}</p>
                       </div>
                     </div>
                   );
@@ -340,15 +340,15 @@ export default function Home() {
             {skippableSkills.length > 0 && (
               <div className="bg-[#141414] border border-[#222]">
                 <div className="px-4 pt-4 pb-3 border-b border-[#1f1f1f]">
-                  <h3 className="font-display font-bold uppercase tracking-widest text-zinc-500 text-base">Skills to Skip</h3>
-                  <p className="text-sm text-zinc-600 mt-1">Negligible payoff — invest here only after your core kit is done.</p>
+                  <h3 className="font-display font-bold uppercase tracking-widest text-zinc-400 text-lg">Skills to Skip</h3>
+                  <p className="text-base text-zinc-500 mt-1">Negligible payoff — invest here only after your core kit is done.</p>
                 </div>
                 <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {skippableSkills.map(skill => (
                     <div key={skill.id} className="p-2.5 bg-[#1a1a1a] border border-[#252525]">
-                      <p className="font-bold text-lg text-zinc-400">{skill.name}</p>
-                      <p className="text-xs text-zinc-600 uppercase tracking-wide mt-0.5">{skill.branch}</p>
-                      <p className="text-sm text-zinc-600 mt-1 leading-snug">{skill.description}</p>
+                      <p className="font-bold text-xl text-zinc-300">{skill.name}</p>
+                      <p className="text-sm text-zinc-500 uppercase tracking-wide mt-0.5">{skill.branch}</p>
+                      <p className="text-base text-zinc-500 mt-1 leading-snug">{skill.description}</p>
                     </div>
                   ))}
                 </div>
@@ -367,36 +367,36 @@ export default function Home() {
                       className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#191919] transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className={`w-2 h-2 bg-${branch.color}-500 flex-shrink-0`} />
-                        <span className="font-bold text-lg uppercase tracking-wide">{branch.name}</span>
-                        <span className="text-xs px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-600 uppercase tracking-wide hidden sm:inline">
+                        <span className={`w-2.5 h-2.5 bg-${branch.color}-500 flex-shrink-0`} />
+                        <span className="font-bold text-xl uppercase tracking-wide">{branch.name}</span>
+                        <span className="text-sm px-1.5 py-0.5 bg-[#1d1d1d] text-zinc-500 uppercase tracking-wide hidden sm:inline">
                           Priority #{branch.priority}
                         </span>
-                        <span className="text-xs text-yellow-400/60 uppercase tracking-wide">{branchPoints} pts</span>
+                        <span className="text-sm text-yellow-400/60 uppercase tracking-wide">{branchPoints} pts</span>
                       </div>
                       {isOpen
-                        ? <ChevronUp size={18} className="text-zinc-600 flex-shrink-0" />
-                        : <ChevronDown size={18} className="text-zinc-600 flex-shrink-0" />}
+                        ? <ChevronUp size={22} className="text-zinc-500 flex-shrink-0" />
+                        : <ChevronDown size={22} className="text-zinc-500 flex-shrink-0" />}
                     </button>
 
                     {isOpen && (
                       <div className="border-t border-[#1f1f1f]">
-                        <p className="text-base text-zinc-600 px-4 py-2.5">{branch.description}</p>
+                        <p className="text-lg text-zinc-500 px-4 py-2.5">{branch.description}</p>
                         <div className="px-3 pb-3 space-y-1.5">
                           {branch.skills.map(skill => (
                             <div key={skill.id} className="flex items-start gap-3 p-2.5 bg-[#1a1a1a] border border-[#252525]">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                  <span className="font-bold text-lg text-zinc-200">{skill.name}</span>
-                                  <span className={`text-xs px-1.5 py-0.5 uppercase tracking-wider ${priorityColors[skill.priority]}`}>{skill.priority}</span>
+                                  <span className="font-bold text-xl text-zinc-100">{skill.name}</span>
+                                  <span className={`text-sm px-1.5 py-0.5 uppercase tracking-wider ${priorityColors[skill.priority]}`}>{skill.priority}</span>
                                   {skill.prerequisitePoints && (
-                                    <span className="text-xs text-zinc-600 uppercase tracking-wide">Req. {skill.prerequisitePoints} pts</span>
+                                    <span className="text-sm text-zinc-500 uppercase tracking-wide">Req. {skill.prerequisitePoints} pts</span>
                                   )}
                                 </div>
-                                <p className="text-base text-zinc-500 leading-relaxed">{skill.description}</p>
-                                <p className="text-sm text-green-400/70 mt-1">{skill.benefit}</p>
+                                <p className="text-lg text-zinc-400 leading-relaxed">{skill.description}</p>
+                                <p className="text-base text-green-400/70 mt-1">{skill.benefit}</p>
                               </div>
-                              <span className="text-yellow-400 font-bold text-base font-mono flex-shrink-0">
+                              <span className="text-yellow-400 font-bold text-lg font-mono flex-shrink-0">
                                 {skill.recommendedPoints}/{skill.maxPoints}
                               </span>
                             </div>
@@ -419,11 +419,11 @@ export default function Home() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex flex-col items-center gap-1 px-3 py-1 transition-colors ${
-              activeTab === tab.id ? 'text-yellow-400' : 'text-zinc-600'
+              activeTab === tab.id ? 'text-yellow-400' : 'text-zinc-500'
             }`}
           >
-            <tab.icon size={20} />
-            <span className="text-[11px] font-bold uppercase tracking-widest">{tab.label.split(' ')[0]}</span>
+            <tab.icon size={24} />
+            <span className="text-xs font-bold uppercase tracking-widest">{tab.label.split(' ')[0]}</span>
           </button>
         ))}
       </nav>

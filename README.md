@@ -28,6 +28,12 @@ A browser-based companion for **Arc Raiders** players. Features a comprehensive 
 - Skip list for low-impact perks
 - Prerequisite requirements for every major unlock
 
+### UI/UX & Accessibility
+- **High-Contrast Design:** Near-black palette with bright yellow accents and light grey text for maximum readability on OLED and standard displays.
+- **Large Typography:** Generous font sizes optimized for quick reference during gameplay.
+- **Responsive Layout:** Tailored experience for both desktop and mobile devices.
+- **Visual Cues:** Rarity and status-based color coding for instant item identification.
+
 ## Shrouded Sky 1.17.0 (February 24, 2026)
 
 - **New enemies:** Firefly (flying, flame attacks) and Comet (rolling explosive sphere)
